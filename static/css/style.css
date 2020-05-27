@@ -1,0 +1,953 @@
+* {
+  box-sizing: border-box;
+}
+
+/* https://stackoverflow.com/questions/8839374/html-and-css-background-image-is-not-showing-up */
+/* https://www.w3schools.com/html/tryit.asp?filename=tryhtml_images_background4 */
+body {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 100%;
+  padding: 10px;
+  margin: 0;
+  background-image: url(/static/images/2019-02-26-Calculus.jpg);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+
+pre, ul, button, h2, h3, h4, input, label {
+  margin: 0;
+  padding: 0;
+}
+
+pre {
+  font-family: "Droid Sans Mono", monospace;
+}
+
+/* https://css-tricks.com/adding-stroke-to-web-text/ */
+h1 {
+  font-family: 'Gentium Basic', serif;
+  font-weight: bold;
+  font-size: 250%;
+  text-decoration: none;
+  margin: 0;
+  line-height: 70px;
+  text-align: center;
+  /* -webkit-text-stroke: 1px black; */
+  color: #CF5C3F;
+  text-shadow:
+      3px 3px 0 #000,
+    -1px -1px 0 #000,  
+     1px -1px 0 #000,
+     -1px 1px 0 #000,
+      1px 1px 0 #000;
+}
+
+h1.image_input{
+  background-image: url(/static/images/calc_bot.png);
+  background-position: left;
+  background-repeat: no-repeat;
+  background-size: 1.5em;
+  background-position-x: 1em;
+  box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.2);
+  border: 2px solid #CF5C3F;
+  overflow: auto;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  animation-name: slideIn;
+  animation-duration: 0.4s
+
+}
+/* https://www.tutorialspoint.com/How-to-remove-underline-from-a-link-in-HTML */
+h1 a:link, h1 a:visited, h1 a:active {
+  color: #CF5C3F;
+  text-decoration: none;
+}
+
+h1 a:hover {
+  color: rgb(255, 255, 255);
+}
+
+/* --------------------------- */
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.1); /* Black w/ opacity */
+  -webkit-animation-name: fadeIn; /* Fade in the background */
+  -webkit-animation-duration: 0.4s;
+  animation-name: fadeIn;
+  animation-duration: 0.4s
+}
+
+/* The Close Button */
+.close {
+  font-size: 175%;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+}
+/* Add Animation */
+@-webkit-keyframes slideIn {
+  from {bottom: -300px; opacity: 0} 
+  to {bottom: 0; opacity: 1}
+}
+
+@keyframes slideIn {
+  from {bottom: -300px; opacity: 0}
+  to {bottom: 0; opacity: 1}
+}
+
+@-webkit-keyframes fadeIn {
+  from {opacity: 0} 
+  to {opacity: 1}
+}
+
+@keyframes fadeIn {
+  from {opacity: 0} 
+  to {opacity: 1}
+}
+/* --------------------------- */
+
+
+/* ---------------------------- */
+/* Alternate the background color of the output rows */
+.modal-content {
+  margin: 10px;
+  padding: 10px;
+  width: auto;
+  background: #FFF;
+  box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.2);
+  border: 2px solid #CF5C3F;
+  overflow: auto;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  animation-name: slideIn;
+  animation-duration: 0.4s
+
+}
+
+.list-group-item:nth-child(even) {
+  background-color: #CF5C3F;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  color: white;
+}
+
+.list-group-item {
+  padding: 10px;
+}
+.chat-log {
+  overflow-y:scroll;
+}
+/* ---------------------------- */
+/* new loader */
+.page    { 
+  display: none; 
+  padding: 0 0.5em; 
+}
+#loading {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  width: 100vw;
+  height: 100vh;
+  background-image: url("https://i.stack.imgur.com/MnyxU.gif");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+/* new loader */
+h2 {
+  padding: 10px 8px;
+}
+
+h3 {
+  padding: 5px 8px;
+}
+
+p {
+  padding: 0px 8px;
+  overflow: scroll;
+}
+
+button{
+  display: none;
+}
+
+/* Result cards */
+/* includes bootstrap-iso from site-footer */
+.result_card, .example-group, .bootstrap-iso {
+  margin: 10px;
+  padding: 10px;
+  background: #FFF;
+  box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.2);
+  border: 2px solid #CF5C3F;
+  overflow: auto;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+}
+
+
+.result_card.result_card_error {
+  border: 2px solid #F33;
+  opacity: 0.7;
+}
+
+
+.card_title {
+  font-size: 12pt;
+  padding: 10px;
+}
+
+.card_title a:link, .card_title a:visited, .card_title a:hover, .card_title a:active {
+  color: inherit;
+  text-decoration: none;
+}
+
+.cell_input {
+  color: black;
+  margin: 0.25em 0;
+  overflow-y: auto;
+  display: none;
+  -webkit-overflow-scrolling: touch;
+  border-bottom: 1px solid #777;
+  text-align: left;
+}
+
+.cell_output {
+  color: black;
+  padding: 0.25em 0;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  font-family: 'Droid Sans Mono', monospace;
+  text-align: center;
+}
+
+.cell_output .cell_pre_output {
+  text-align: left;
+}
+
+.cell_output table {
+  border-collapse: collapse;
+  border: 1px solid #000;
+  margin: auto;
+}
+
+.cell_output td, .cell_output th {
+  border: 1px solid #000;
+  padding: 0.25em 0.5em;
+}
+
+
+.result_card {
+  border-top: 1px solid #777;
+  font-size: 3em;
+  font-family: 'Open Sans', sans-serif;
+  text-align: left;
+  animation-name: fadeInUp;;
+  animation-duration: .7s;
+}
+
+.result_card {
+  font-size: 1em;
+  margin: 0.5em 0;
+  padding: 0;
+}
+
+.result_card label {
+  margin-left: 0.25em;
+}
+
+.result_variables {
+  text-align: left;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.result_variables li {
+  display: inline-block;
+}
+
+.result_variables button {
+  padding: 0.25em 1em;
+}
+
+.result_variables button.active {
+  background: #444;
+  border: 0px;
+  cursor: default;
+}
+
+.card_actions {
+  display: none;
+  list-style-type: none;
+  font-size: 0.75em;
+}
+
+.card_actions li {
+  display: inline-block;
+  border-bottom: 2px solid #CCC;
+}
+
+/* Main page columns (saved and example queries) */
+
+.main {
+  line-height: 1.15em;
+}
+
+.main p {
+  margin: 0;
+  padding: 0;
+}
+
+.col h2 {
+  text-align: center;
+  font-size: 1.25em;
+  font-weight: normal;
+}
+
+.col ul {
+  list-style-type: none;
+}
+
+.col.recent a.remove {
+  width: auto;
+  float: right;
+  display: none;
+}
+
+.col.recent li:hover a.remove {
+  display: block;
+}
+
+.example-group {
+  background: #FFF;
+  box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.2);
+  border: 2px solid #CF5C3F;
+  overflow: auto;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  animation-name: fadeInUp;
+  animation-duration: 1s;
+}
+
+/* https://daneden.github.io/animate.css/ */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    -webkit-transform: translate3d(0, 100%, 0);
+    transform: translate3d(0, 100%, 0);
+  }
+
+  to {
+    opacity: 1;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/**************************************************/
+/* https://www.w3schools.com/css/tryit.asp?filename=trycss3_animation1 */
+/* https://daneden.github.io/animate.css/ */
+/**************************************************/
+
+.example-group h3 {
+  font-weight: normal;
+  padding: 0;
+  cursor: pointer;
+  font-size: 100%;
+  padding: 0.6em 0.25em 0.5em;
+}
+
+.example-group i {
+  cursor: pointer;
+  float: left;
+  margin: 0.4em 0.45em;
+  font-size: 1.25em;
+}
+
+.example-group h3.shown {
+  border-bottom: 1px solid #777;
+}
+
+.example-group .contents2 {
+  clear:both;
+  padding: 0.5em 0.5em;
+  text-align: center;
+  animation-name: fadeInUp;
+  animation-duration: 1s;
+  
+}
+
+.example-group h4 {
+  font-weight: 600;
+  padding: 0.25em 0 0;
+}
+
+.example-group li {
+  margin: 0 1em;
+}
+
+.example-group a:link, .example-group a:visited{
+  text-decoration: none;
+  color: #000;
+  font-family: 'Droid Sans Mono', monospace;
+}
+
+.example-group a:hover, .example-group a:active {
+  text-decoration: none;
+  color: #CF5C3F;
+  font-family: 'Droid Sans Mono', monospace;
+  font-size:1.25em;
+
+}
+
+.example-group li > span {
+  display: block;
+  padding: 0.125em 0;
+  font-style: italic;
+  font-size: 90%;
+}
+
+.col button a:link, .col button a:visited,
+.col button a:hover, .col button a:active {
+  color: #FFF;
+  text-decoration: none;
+}
+
+/* Derivative/integral steps */
+
+.steps {
+  text-align: left;
+  font-size: 0.9em;
+  font-family: 'Open Sans', sans-serif;
+  max-width: 1600px;
+  overflow: auto;
+  margin: auto;
+}
+
+.steps li {
+  min-width: 300px;
+}
+
+/* colors from http://gamedev.stackexchange.com/questions/46463 */
+.steps ol {
+  list-style-type: decimal;
+  padding: 0 30px;
+  overflow: scroll;
+}
+.steps ol h2 {
+  border: 2px solid #CF5C3F;
+  overflow: auto;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  font-size: 1em;
+  overflow: scroll;
+
+}
+
+.steps ol ol h2 {
+  border: 2px solid #CF5C3F;
+  overflow: auto;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  font-size: 1em;
+  overflow: scroll;
+
+}
+
+.steps ol ol ol h2 {
+  border: 2px solid #CF5C3F;
+  overflow: auto;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  font-size: 1em;
+  overflow: scroll;
+}
+
+.steps ol ol ol ol h2 {
+  border: 2px solid #CF5C3F;
+  overflow: auto;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  font-size: 1em;
+  overflow: scroll;
+}
+
+.steps ol ol ol ol ol h2 {
+  border: 2px solid #CF5C3F;
+  overflow: auto;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  font-size: 1em;
+  overflow: scroll;
+}
+
+/* https://www.w3schools.com/css/css3_borders.asp */
+/* https://www.w3schools.com/cssref/sel_attribute_value.asp */
+div[target]{
+  border-radius: 25px;
+
+}
+
+.collapsible  {
+  cursor: pointer;
+  padding: 0;
+  font-size: 1em;
+  margin: 0.25em 0;
+  overflow: scroll;
+}
+
+.collapsible:hover {
+  background-color: rgb(209, 107, 82);
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  color: black;
+  visibility: visible;
+}
+
+.collapsible:active {
+  background-color: rgb(209, 107, 82);
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  color: black;
+}
+/* https://stackoverflow.com/questions/4084674/make-one-div-visible-and-another-invisible */
+ol.content {
+  background-color: rgb(209, 107, 82);
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  padding: 0 18px;
+  display: none;
+  overflow: scroll;
+  transition: max-height 0.2s ease-out;
+  background-color: #f1f1f1;
+}
+
+/* Phones/mobile devices */
+@media screen and (max-device-width:200px) {
+
+  .result_card {
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    border: 2px solid #DDD;
+    border-radius: 2px;
+    margin: 3px;
+    padding: 5px;
+  }
+
+  .col {
+    width: 50%;
+    font-size: 125%;
+  }
+
+  .col.recent a.remove {
+    display: inline-block;
+  }
+
+  .col.example .example-group li > span {
+    padding-top: 0.25em;
+  }
+
+  .col.example .example-group li > span:after {
+    content: ":";
+  }
+
+  .example-group, .contents2 {
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    text-align: center;
+
+
+    }
+
+  .result{
+    width: 100%;
+    margin: 10px auto;
+  }
+
+  #mobile-keyboard button {
+    width: 2em;
+    font-size: 1.25em;
+    margin: 0;
+  }
+}
+
+/* Tablets and base for desktops */
+@media screen and (min-device-width: 500px) {
+  .result {
+    width: 600px;
+    margin: 10px auto;
+  }
+
+  .main {
+    width: 740px;
+    margin: 10px auto;
+  }
+
+  .col.example {
+    margin: auto;
+  }
+  .col.example div.example-group li {
+    margin: 0.25em 0;
+  }
+
+  #mobile-keyboard button {
+    width: 3em;
+    font-size: 1.5em;
+  }
+}
+
+@media screen and (min-device-width: 1280px) {
+  .main {
+    width: 100%;
+    margin: 10px auto;
+  }
+
+  .col {
+    width: 390px;
+  }
+
+  .col.example {
+    width: 75%;
+  }
+
+  .col.recent+.col.example {
+    width: 390px;
+  }
+
+  .col.example li {
+    margin: 0;
+  }
+}
+
+/* https://codepen.io/meericcartman/pen/GpJavw */
+
+/* ===========================
+   ====== Search Box ====== 
+   =========================== */
+
+   .search1
+   {
+     border: 2px solid #CF5C3F;
+     background-color: white;
+     overflow: auto;
+     border-radius: 5px;
+     -moz-border-radius: 5px;
+     -webkit-border-radius: 5px;
+   }
+
+   .input-group
+   {
+     background-color: white;
+     overflow: auto;
+     height: 50%;
+     border-radius: 5px;
+     -moz-border-radius: 5px;
+     -webkit-border-radius: 5px;
+     margin-top: 10px;
+   }
+  /* for chat bot modal */
+   .form-control{
+     width: 100%;
+     border: 2px solid #CF5C3F;
+     padding: 15px;
+     font-size: 1em;
+   }
+   
+   .search1 input[type="text"]
+   {
+     border: 0px;
+     width: 93.2%;
+     padding: 10px 10px;
+     font-size: 15px;
+   }
+
+   .form-control input[type="text"]
+   {
+      color: white;
+   }
+   
+   .search1 input[type="text"]:focus
+   {
+     outline: 0;
+   }
+   
+   .search1 input[type="submit"]
+   {
+    font-size: 15px;
+     border: 0px;
+     background: white;
+     background-color: #CF5C3F;
+     color: #fff;
+     float: right;
+     padding: 10px;
+     /* border-radius-top-right: 5px; */
+     -moz-border-radius-top-right: 5px;
+     -webkit-border-radius-top-right: 5px;
+     /* border-radius-bottom-right: 5px; */
+     -moz-border-radius-bottom-right: 5px;
+     -webkit-border-radius-bottom-right: 5px;
+           cursor:pointer;
+   }
+   /* ===========================
+      ====== Medua Query for Search Box ====== 
+      =========================== */
+
+      @media only screen and (min-width : 1000px) and (max-width : 2000px)
+      {
+        
+        .search1
+        {
+          width: 94%;
+          margin: 0 auto;
+        }
+   
+        .search1 input[type="text"]:focus
+        {
+          border: 0px;
+          width: 94.8%;
+          padding: 10px 10px;
+        }
+      
+      }
+   
+   @media only screen and (min-width : 150px) and (max-width : 1000px)
+   {
+     
+    .search1
+     {
+       width: 95%;
+       margin: 0 auto;
+     }
+
+     .search1 input[type="text"]:focus 
+     {
+       border: 0px;
+       width: 95%;
+       padding: 10px 10px;
+     }
+   
+   }
+
+   @media only screen and (min-width : 150px) and (max-width : 700px)
+   {
+     
+    .search1
+     {
+       width: 92%;
+       margin: 0 auto;
+     }
+   
+     .search1 input[type="text"]:focus
+     {
+       border: 0px;
+       width: 92.5%;
+       padding: 10px 10px;
+     }
+   }
+
+/* site footer */
+
+   .bootstrap-iso{
+    animation-name: fadeInUp;
+    animation-duration: 1s;
+   }
+
+   .site-footer
+   {
+     background-color:white;
+     padding:20px;
+     font-size:15px;
+     color:black;
+     animation-name: fadeInUp;
+     animation-duration: 1s;
+   }
+   .container2 {
+    display: inline-block;
+    }
+   .site-footer hr
+   {
+     border-top-color:black;
+     opacity:0.5
+   }
+   .site-footer hr.small
+   {
+     margin:20px
+   }
+   .site-footer h6
+   {
+     color:black;
+     font-size:16px;
+     text-transform:uppercase;
+     margin-top:5px;
+     letter-spacing:2px
+   }
+   .site-footer a
+   {
+     color:#737373;
+     text-decoration: none;
+   }
+   .site-footer a:hover
+   {
+     color:#3366cc;
+     text-decoration:none;
+   }
+   .footer-links
+   {
+     padding-left:0;
+    list-style: unset;
+   }
+   .footer-links li
+   {
+     display:'block';
+   }
+   .footer-links a
+   {
+     color:#737373
+   }
+   .footer-links a:active,.footer-links a:focus,.footer-links a:hover
+   {
+     color:#3366cc;
+     text-decoration:none;
+   }
+   .footer-links.inline li
+   {
+     display:inline-block
+   }
+   .site-footer .social-icons
+   {
+     text-align:right
+   }
+   .site-footer .social-icons a
+   {
+     width:40px;
+     height:40px;
+     line-height:40px;
+     margin-left:6px;
+     margin-right:0;
+     border-radius:100%;
+     background-color:#33353d
+   }
+   .copyright-text
+   {
+     margin:0
+   }
+   @media (max-width:991px)
+   {
+     .site-footer [class^=col-]
+     {
+       margin-bottom:30px
+     }
+   }
+   @media (max-width:767px)
+   {
+     .site-footer
+     {
+       padding-bottom:0
+     }
+     .site-footer .copyright-text,.site-footer .social-icons
+     {
+       text-align:center
+     }
+   }
+   .social-icons
+   {
+     padding-left:0;
+     margin-bottom:0;
+     list-style:none
+   }
+   .social-icons li
+   {
+     display:inline-block;
+     margin-bottom:4px
+   }
+   .social-icons li.title
+   {
+     margin-right:15px;
+     text-transform:uppercase;
+     color:#96a2b2;
+     font-weight:700;
+     font-size:13px
+   }
+   .social-icons a{
+     background-color:#eceeef;
+     color:#818a91;
+     font-size:16px;
+     display:inline-block;
+     line-height:44px;
+     width:44px;
+     height:44px;
+     text-align:center;
+     margin-right:8px;
+     border-radius:100%;
+     -webkit-transition:all .2s linear;
+     -o-transition:all .2s linear;
+     transition:all .2s linear
+   }
+   .social-icons a:active,.social-icons a:focus,.social-icons a:hover
+   {
+     color:#fff;
+     background-color:#29aafe
+   }
+   .social-icons.size-sm a
+   {
+     line-height:34px;
+     height:34px;
+     width:34px;
+     font-size:14px
+   }
+   .social-icons a.facebook:hover
+   {
+     background-color:#3b5998
+   }
+   .social-icons a.twitter:hover
+   {
+     background-color:#00aced
+   }
+   .social-icons a.linkedin:hover
+   {
+     background-color:#007bb6
+   }
+   .social-icons a.dribbble:hover
+   {
+     background-color:#ea4c89
+   }
+   @media (max-width:767px)
+   {
+     .social-icons li.title
+     {
+       display:block;
+       margin-right:0;
+       font-weight:600
+     }
+   }

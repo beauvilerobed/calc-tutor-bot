@@ -1,0 +1,108 @@
+{"intents": [
+        {"tag": "greeting",
+         "patterns": ["Hi there", "How are you", "Is anyone there?","Hey","Hola", "Hello", "Good day"],
+         "responses": ["Hello! Ask me how can I help you?", "Hello, good to see you! Ask me how can I help you?", "Hi there, how can I help? Ask me how can I help you?", "How's it hanging? Ask me how can I help you?", "What's good? Ask me how can I help you?", "Hi, what questions do you have for me today? Ask me how can I help you?"],
+         "context": [""]
+        },
+        {"tag": "goodbye",
+         "patterns": ["Bye", "See you later", "Goodbye", "Nice chatting with you, bye", "Till next time"],
+         "responses": ["See you soon!", "Have a nice day", "Bye! Come back again soon."],
+         "context": [""]
+        },
+        {"tag": "thanks",
+         "patterns": ["Thanks", "Thank you", "That's helpful", "Awesome, thanks", "Thanks for helping me", "Thank you for the response"],
+         "responses": ["Happy to help!", "Any time!", "My pleasure"],
+         "context": [""]
+        },
+        {"tag": "noanswer",
+         "patterns": ["limit","function", "polynomial", "Velocity", "Distance", "Precise Definition of a limit", "continous", "fundamental"],
+         "responses": ["Sorry, this is a topic I can't help you with. Ask me about the rules.", "Please give me more info, I may be able to help.", "Not sure I understand, this isn't a question about derivative or integral rules.", "I'm not sure, this doesn't seem like a question about differentiation or integral rule"],
+         "context": [""]
+        },
+        {"tag": "noanswer2",
+        "patterns": ["complex numbers", "force", "work", "Distance", "Precise Definition", "discontinous", "fundamental theorem"],
+        "responses": ["hmmm... this question is out of the scope of my expertise.", "Woah, try rewriting your questions, right now it's confusing me.", "Not too sure about this question, this is out of my scope.", "You gotta make sure your are asking about differentiation or integral rules, otherwise I can't help."],
+        "context": [""]
+        },
+        {"tag": "options",
+         "patterns": ["I need your help.", "I'm stuck", "Can you assist me?", "I need some assistance", "help with steps"],
+         "responses": ["Here to help! Ask me anything about the derivative integral rules", "At your service! Ask my about some integral or derivative rules", "Calc-bot to the rescue! What questions do you have about the derivative and/or integral rules?", "Here to offer you support. What integral or derivative rule do you need help with?"],
+         "context": [""]
+        },
+        {"tag": "options2",
+        "patterns": ["How could you help me?", "How can you help me?", "What can you do for me?", "What help do you provide?", "How can you be helpful?", "What support is offered"],
+        "responses": ["My job is to answer questions you may have regarding derivative or integral rules given to you.", "I'm here to help you with questions you may have about the derivates rules or integration rules.", "My job is to help you understand the derivative and antiderivative rules", "Offering support for the question you may have about the differentiation or integration rules is my purpose."],
+        "context": [""]
+        },
+        {"tag": "power_rule",
+         "patterns": ["power always true?", "power true for n equal -1?" ],
+         "responses": ["Good question! The power rule is always true; even if the exponent is a fractionf, negative or even irrational", "whether the exponent is negative, positive or even zero, the power rule is always true!"],
+         "context": [""]
+        },
+        {"tag": "what_is",
+         "patterns": ["what antiderivative", "misunderstand antiderivative", "main point antiderivative","main idea antiderivative", "explain antiderivative", "tell antiderivative"],
+         "responses": ["It is the reverse of finding a Derivative, in other words the derivative of the antiderivative is the original function!","Think of the antiderivative as moving back from the derivative. If you take the derivative of a function then 'integrate' you get back to the original function!"],
+         "context": [""]
+        },
+        {"tag": "what_is2",
+        "patterns": ["what integral", "misunderstand integral", "main point integral","main idea integral", "explain integral", "tell integral"],
+        "responses": ["Think of the indefinite integral as the reverse of finding a Derivative plus a constant.", "Think of the integtal as this: the derivative of the integral is the original function! Note that we are only talking about the indefinite integral","Think of the integral as moving back from the derivative. If you take the derivative of a function then integrate you get back to the original function! Note that we are only talking about the indefinite integral."],
+        "context": [""]
+        },
+        {"tag": "what_is3",
+        "patterns": ["what is the symbol \"u\" in the steps", "I don't understand the letter \"u\"", "Can you explain the letter u?", "tell u"],
+        "responses": ["Think of the letter u as a replacement for the previous variable or function, try writting each step down to really see what's going on.", "Think of the symbol u as this: I have a function or variable that I must integral or differentiate. let u be that function and square it or divide it as the formula says! Note that we are only talking about the function or the variable and what's being applied to it.","Think of the unknown letter or symbol u as makeing an expression simple to evaluate. For example, if a function is squared then let u be that function and square u. Then we can integrate of differentiate if we'd like."],
+        "context": [""]
+        },
+        {"tag": "chain_rule_tips",
+         "patterns": ["remember chain rule", "can't remember chain rule", "any tips remember chain rule?", "recall the chain rule?", "different ways to get the chain rule?" ],
+         "responses": [" let y=f(x) and u=g(x), if dy/du and du/dx were fractions, then we could \"cancel\" du."],
+         "context": [""]
+        },
+        {"tag": "chain_rule",
+        "patterns": ["what chain rule", "explain chain rule", "Tell chain rule?", "chain rule work?" ],
+        "responses": ["The chain rule tells us how to find the derivative of a composite function.","The chain rule tell you that you can take the derivative of a composite function and the formula for it"],
+        "context": [""]
+        },
+        {"tag": "implicit_differentiation",
+         "patterns": ["Why use implicit", "point of implicit", "how to we use implicit differentiation?", "implicit good for?"],
+         "responses": ["Sometimes it's not easy to solve Equations for y explicitly as a function of x by hand, so that we can find the derivative. Fortunately, we can use implicit differentiation to find the derivative","'some function of y and x equals something else'. Knowing x does not lead directly to y. Fortunately, we can use implicit differentiation to find the derivative"],
+         "context": [""]
+        },
+        {"tag": "implicit_differentiation2",
+        "patterns": ["how to we use implicit?", "steps for implicit"],
+        "responses": ["If y=f(x) then 1. Differentiate with respect to x 2. Collect all the  dydx on one side 3. Solve for  dy/dx"],
+        "context": [""]
+        },
+        {"tag": "indeterminate_form",
+         "patterns": ["what is an example of indeterminate form?", "List some indeterminante forms"],
+         "responses": ["Some examples include 0/0, plus or minus infinity divided by plus or minus infinity, or even plus or minus infinity multiplied by 0"],
+         "context": [""]
+        },
+        {"tag": "indeterminate_form2",
+        "patterns": ["what indeternminate mean?"],
+        "responses": ["Some examples include 0/0, plus or minus infinity divided by plus or minus infinity, or even plus or minus infinity multiplied by 0"],
+        "context": [""]
+        },
+        {"tag": "L'hopital's_rule",
+         "patterns": ["How do I know when to use L'hopital rule", "when is it a good time to use L'hopital's rule", "when could I use L'hopital's rule"],
+         "responses": ["If you have an indeterminate form then you can use the rule which is provided in the cheat sheet"],
+         "context": [""]
+        },
+        {"tag": "indefinite_integral",
+         "patterns": ["what is the difference between definite and indefinite Integral?", "how do I distinguish between integral and definite integral", "how do the definite and indefinite integral differ?" ],
+         "responses": ["Note that the definite is number, whereas an indefinite integral(also can be called antiderivative) is a function or family of functions"],
+         "context": [""]
+        },
+        {"tag": "substitution_and_by_parts_rule",
+         "patterns": ["how do I know when to use the substitution rule?", "when can I use the substitution rule?", "When is it important to use the substitution?","how do I know when to use the integration by parts rule?", "when can I use the integration by parts rule?", "When is it important to use the integration by parts rule?"],
+         "responses": ["Although there's no set rule, remember the phrase \"if you can't differentiate and replace don't evaluate\" and you have a great chance of determining when to use the rule. But understand that it's all about practice, practice, pracitce", "Practice, practice, practice, since there's no set rule. Another usefule tip is remember the phrase \"if you can't differentiate and replace don't evaluate\" "],
+         "context": [""]
+        },
+        {"tag": "partial_derivative",
+         "patterns": ["how do I find the partial derivative?", "how can I compute parital derivatives?"],
+         "responses": ["All you have to remember is that the partial derivative with respect to x, for example, is just the ordinary derivative keeping all other variables fixed", "Note that if you are taking the derivative with respect to x, for example, fix the other variable and treat the other variable as a \"number\" or a constatnt", "While taking the derivative with respect to one variable, the other variable will treated as fixed and it's exacly like taking the derivative of an derivative of one variable"],
+         "context": [""]
+        }
+   ]
+}

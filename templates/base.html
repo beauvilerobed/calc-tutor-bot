@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        {% load static %}
+        <title>{% block title %}{% endblock %}</title>
+        <link rel="icon" href="/static/images/favicon.ico" type="image/ico" />
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=.5, maximum-scale=.5" />
+
+        {% block head_additional %}{% endblock %}
+        <link rel="stylesheet" href="{{ MEDIA_URL }}css/style.css" type="text/css" media="screen"/>
+        <link href="https://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"
+                type="text/javascript"></script>
+        <script src="https://d3js.org/d3.v3.min.js" type="text/javascript"></script>
+        <script src="{{ MEDIA_URL }}js/base.js" type="text/javascript"></script>
+        <script src="{{ MEDIA_URL }}js/modal.js" type="text/javascript"></script>
+        <script src="{{ MEDIA_URL }}js/card.js" type="text/javascript"></script>
+        <script src="{{ MEDIA_URL }}js/gamma.js" type="text/javascript"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_CHTML-full"></script>
+    </head>
+    <body>
+    {% block content %}  
+    {% endblock %}
+</body>
+</html>

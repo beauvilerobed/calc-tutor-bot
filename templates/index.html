@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load extra_tags %}
+{% block title %}
+Math Tutor
+{% endblock %}
+
+{% block content %}
+<h1><a href="/">Calc Tutor &nbsp;</a>
+  <a id="myBtn" href="#">Let's Chat</a></br>
+  <a id="myBtn" href="/table">Quick Reference Guide</a>
+</h1>
+  <!-- The Modal -->
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <div class="container">
+      <h1 class="image_input"><a class="close" id="myBtn" href="#">Calc-Bot</a></h1>
+
+      <div class="row">
+        <div class="col-xs-6 offset-xs-3">
+          <ul class="list-group chat-log js-chat-log">
+          </ul>
+
+          <div class="input-group input-group-lg mt-1">
+            <input type="text" class="form-control js-text" placeholder="Type something and press enter to begin..."/>
+            <span class="input-group-btn">
+            </span>
+          </div>
+          
+        </div>
+      </div>
+
+    </div>
+    <script src="{% static 'js/jquery.js' %}"></script>
+    <script src="{% static 'js/js.cookie.js' %}"></script>
+    <script>
+      var chatterbotUrl = '{% url "chatbot" %}';
+      function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+        return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+
+      function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+      }
+
+      $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+          if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+          }
+        }
+      });
+
+      var $chatlog = $('.js-chat-log');
+      var $input = $('.js-text');
+      var $sayButton = $('.js-say');
+
+      function createRow(text) {
+        var $row = $('<li class="list-group-item"></li>');
+
+        $row.text(text);
+        $chatlog.append($row);
+      }
+
+      function submitInput() {
+        var inputData = {
+          'text': $input.val()
+        }
+
+
+        // Display the user's input on the web page
+        createRow(inputData.text);
+
+        var $submit = $.ajax({
+          type: 'POST',
+          url: chatterbotUrl,
+          data: JSON.stringify(inputData),
+          contentType: 'application/json'
+        });
+
+        $submit.done(function(statement) {
+            createRow(statement.text);
+
+            // Clear the input field
+            $input.val('');
+
+            // Scroll to the bottom of the chat interface
+            $chatlog[0].scrollTop = $chatlog[0].scrollHeight;
+        });
+
+        $submit.fail(function() {
+          // TODO: Handle errors
+        });
+      }
+
+      $sayButton.click(function() {
+        submitInput();
+      });
+
+      $input.keydown(function(event) {
+        // Submit the input when the enter button is pressed
+        if (event.keyCode == 13) {
+          submitInput();
+        }
+      });
+    </script>
+
+  </div>
+
+</div>
+
+    <div class="search1">
+      <form action="/input/" class="search-form" method="GET">
+        {{ form.i }}
+        <input type="submit" value="=">
+      </form>
+    </div>
+
+    <div class="main">
+        <div class="col example">
+
+            {% for category in examples %}
+            <div class="example-group">
+              <div class="contents2">
+                {% for subcategory in category.1 %}
+                  {% if subcategory.0 %}
+                  <h4>{{ subcategory.0 }}</h4>
+                  {% endif %}
+                  <ul>
+                    {% for example in subcategory.1 %}
+                    <li>{% make_example example %}</li>
+                    {% endfor %}
+                  </ul>
+                {% endfor %}
+              </div>
+
+            </div>
+            {% endfor %}
+
+        <!-- https://formden.com/blog/isolate-bootstrap -->
+        <link rel="stylesheet" href="https://formden.com/static/assets/demos/bootstrap-iso/bootstrap-iso/bootstrap-iso.css">
+        <div class="bootstrap-iso">
+        <div class="site-footer">
+            <div class="row">
+              <div class="container2">
+              <div class="col-sm-12 col-md-6">
+                <h6>About</h6>
+                <p class="text-justify">Cal-Tutor came from the need to make differentiating and integration straightforward and more interactive for students. Over time it has evolved so that it could help anyone seeking to understand the necessary steps required to solve certain integral or derivative problems. The hidden step-by-step presentation is meant to emphasize and promote active learning. Also, it implicitly provides intuition for new problems, even the one that don't have a step-by-step presentation. As always the more you practice the easier it becomes. Have fun! </p>              </div>
+              <div class="col-xs-6 col-md-3">
+                <h6>tools</h6>
+                <ul class="footer-links">
+                  <li><a href="https://www.djangoproject.com">Django</a></li>
+                  <li><a href="https://numpy.org">Numpy</a></li>
+                  <li><a href="https://keras.io">Keras</a></li>
+                  <li><a href="https://www.tensorflow.org">Tensorflow</a></li>
+                  <li><a href="https://www.sympy.org/en/index.html">SymPy</a></li>
+                  <li><a href="https://www.nltk.org">NLTK</a></li>
+                  <li><a href="https://d3js.org">D3.js</a></li>
+                </ul>
+              </div>
+              <div class="col-xs-6 col-md-3">
+                <h6>Quick Links</h6>
+                <ul class="footer-links">
+                  <li><a href="/">Home</a></li>
+                  <li><a href="/about">Reference Guide</a></li>
+                  <li><a id="myBtn" href="#">Top page</a></li>
+                  <li><a href="https://docs.djangoproject.com/en/3.0/intro/tutorial01/">Start your first Django project</a></li>
+                </ul>
+              </div>
+            </div>
+            <hr>
+          </div>
+        </div>
+      </div>
+        </div>
+    </div>
+{% endblock %}
+
