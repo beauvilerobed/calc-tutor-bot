@@ -12,9 +12,9 @@ urlpatterns = [
     path('', views.index),
 
     path('input/', views.input),
-    path('table/', views.table),
+    path('ReferenceGuide/', views.ReferenceGuide),
 
-    path('card/<card_name>', views.eval_card),
+    path('card/<card_name>', views.returnResultAsCard),
 
     path('card_info/<card_name>', views.get_card_info),
 

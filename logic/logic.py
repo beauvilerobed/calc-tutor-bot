@@ -3,7 +3,6 @@ import traceback
 import collections
 from logic.utils import Eval, latexify, arguments, removeSymPy, \
     custom_implicit_transformation, synonyms, OTHER_SYMPY_FUNCTIONS
-    # close_matches
 from logic.resultsets import find_result_set, get_card, format_by_type, \
     is_function_handled
 from sympy import latex, series, sympify, solve, Derivative, \
@@ -63,13 +62,6 @@ class Evaluate_card(object):
             parsed, arguments, evaluator, evaluated = result
 
             cards = []
-
-            # close_match = close_matches(s, sympy.__dict__)
-            # if close_match:
-            #     cards.append({
-            #         "ambiguity": close_match,
-            #         "description": ""
-            #     })
 
             try:
                 cards.extend(self.prepare_cards(parsed, arguments, evaluator, evaluated))
@@ -179,14 +171,6 @@ class Evaluate_card(object):
             "output": latex_input
         })
 
-        # if cards:
-        #     if any(get_card(c).is_multivariate() for c in cards):
-        #         result[-1].update({
-        #             "num_variables": len(components['variables']),
-        #             "variables": map(repr, components['variables']),
-        #             "variable": repr(components['variable'])
-        #         })
-
         # If no result cards were found, but the top-level call is to a
         # function, then add a special result card to show the result
         if not cards and not components['variable'] and is_function:
@@ -203,23 +187,6 @@ class Evaluate_card(object):
                 result.append(
                     {"title": "Result", "input": "",
                      "output": format_by_type(evaluated, arguments, mathjax_latex)})
-
-            # line = "simplify(input_evaluated)"
-            # simplified = evaluator.eval(line,
-            #                             use_none_for_exceptions=True,
-            #                             repr_expression=False)
-            # if (simplified != None and
-            #     simplified != evaluated and
-            #     arguments.args and
-            #     len(arguments.args) > 0 and
-            #     simplified != arguments.args[0]):
-            #     result.append(
-            #         {"title": "Simplification", "input": repr(simplified),
-            #          "output": mathjax_latex(simplified)})
-            # elif arguments.function == 'simplify':
-            #     result.append(
-            #         {"title": "Simplification", "input": "",
-            #          "output": mathjax_latex(evaluated)})
 
             for card_name in cards:
                 card = get_card(card_name)

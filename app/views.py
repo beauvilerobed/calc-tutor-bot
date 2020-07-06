@@ -26,7 +26,7 @@ from django.views.decorators.csrf import csrf_exempt
 # https://devcenter.heroku.com/articles/getting-started-with-python#push-local-changes
 import requests
 
-EXAMPLES = [
+ExamplesForHomePage = [
     ('Calculus', [
         ['Derivatives', [
             ('Learn how to derive the product rule for multiple functions', 'diff(f(x)*g(x)*h(x)*k(x))'),
@@ -67,27 +67,7 @@ class MobileTextInput(forms.widgets.TextInput):
 class SearchForm(forms.Form):
     i = forms.CharField(required=False, widget=MobileTextInput())
 
-def authenticate(view):
-    def _wrapper(request, **kwargs):
-        user = None
-        result = view(request, user, **kwargs)
-
-        try:
-            template, params = result
-        except ValueError:
-            return result
-
-        if user:
-            params['auth_url'] = None
-            params['auth_message'] = None
-        else:
-            params['auth_url'] = None
-            params['auth_message'] = None
-        return template, params
-    return _wrapper
-
-@authenticate
-def index(request, user):
+def index(request):
     form = SearchForm()
     user = None
 
@@ -96,69 +76,64 @@ def index(request, user):
     return render(request,"index.html", {
         "form": form,
         "MEDIA_URL": settings.STATIC_URL,
-        "examples": EXAMPLES
+        "examples": ExamplesForHomePage
         })
 
-@authenticate
-def table(request, user):
-    return render(request,"table.html", {
+def ReferenceGuide(request):
+    return render(request,"ReferenceGuide.html", {
         "MEDIA_URL": settings.STATIC_URL,
         "table_active": "selected",
         })
 
-@authenticate
-def input(request, user):
+
+def input(request):
     if request.method == "GET":
         form = SearchForm(request.GET)
         if form.is_valid():
             input = form.cleaned_data["i"]
 
-            g = Evaluate_card()
-            r = g.eval(input)
+            EvaluateCard = Evaluate_card()
+            Evaluated = EvaluateCard.eval(input)
 
-            if not r:
-                r = [{
+            if not Evaluated:
+                Evaluated = [{
                     "title": "Input",
                     "input": input,
                     "output": "Can't handle the input."
                 }]
-            # else:
-            #     r = [{
-            #         "title": "Input",
-            #         "input": str(r[1]),
-            #         "output": "Can't handle the input."
-            #     }]
 
             return render(request,"result.html", {
                 "input": input,
-                "result": r,
+                "result": Evaluated,
                 "form": form,
                 "MEDIA_URL": settings.STATIC_URL,
                 })
 
-def _process_card(request, card_name):
-    variable = request.GET.get('variable')
-    expression = request.GET.get('expression')
-    if not variable or not expression:
+def processVariablesExpressionsAndEvaluatedcard(request, card_name):
+    VariablesFromInput = request.GET.get('variable')
+    ExpressionFromInput = request.GET.get('expression')
+    if not VariablesFromInput or not ExpressionFromInput:
         raise Http404
-# https://stackoverflow.com/questions/8628152/url-decode-with-python-3/8628164
-    variable = urllib.parse.unquote(variable)
-    expression = urllib.parse.unquote(expression)
 
-    g = Evaluate_card()
+# https://stackoverflow.com/questions/8628152/url-decode-with-python-3/8628164
+
+    unquotedVariable = urllib.parse.unquote(VariablesFromInput)
+    unquotedExpression = urllib.parse.unquote(ExpressionFromInput)
+
+    EvaluateCard = Evaluate_card()
 
     parameters = {}
     for key, val in request.GET.items():
         parameters[key] = ''.join(val)
 
-    return g, variable, expression, parameters
+    return EvaluateCard, unquotedVariable, unquotedExpression, parameters
 
 
-def eval_card(request, card_name):
-    g, variable, expression, parameters = _process_card(request, card_name)
+def returnResultAsCard(request, card_name):
+    EvaluateCard, unquotedVariable, unquotedExpression, parameters = processVariablesExpressionsAndEvaluatedcard(request, card_name)
 
     try:
-        result = g.eval_card(card_name, expression, variable, parameters)
+        result = EvaluateCard.eval_card(card_name, unquotedExpression, unquotedVariable, parameters)
     except ValueError as e:
         return HttpResponse(json.dumps({
             'error': e.message
@@ -166,17 +141,17 @@ def eval_card(request, card_name):
     except:
         trace = traceback.format_exc(5)
         return HttpResponse(json.dumps({
-            'error': ('There was an error in Gamma. For reference'
+            'error': ('There was an error. For reference'
                       'the last five traceback entries are: ' + trace)
         }), content_type="application/json")
 
     return HttpResponse(json.dumps(result), content_type="application/json")
 
 def get_card_info(request, card_name):
-    g, variable, expression, _ = _process_card(request, card_name)
+    EvaluateCard, unquotedVariable, unquotedExpression, _ = processVariablesExpressionsAndEvaluatedcard(request, card_name)
 
     try:
-        result = g.get_card_info(card_name, expression, variable)
+        result = EvaluateCard.get_card_info(card_name, unquotedVariable, unquotedExpression)
     except ValueError as e:
         return HttpResponse(json.dumps({
             'error': e.message
@@ -191,11 +166,11 @@ def get_card_info(request, card_name):
     return HttpResponse(json.dumps(result), content_type="application/json")
 
 def get_card_full(request, card_name):
-    g, variable, expression, parameters = _process_card(request, card_name)
+    EvaluateCard, unquotedVariable, unquotedExpression, parameters = processVariablesExpressionsAndEvaluatedcard(request, card_name)
 
     try:
-        card_info = g.get_card_info(card_name, expression, variable)
-        result = g.eval_card(card_name, expression, variable, parameters)
+        card_info = EvaluateCard.get_card_info(card_name, unquotedVariable, unquotedExpression)
+        result = EvaluateCard.eval_card(card_name, unquotedVariable, unquotedExpression, parameters)
         card_info['card'] = card_name
         card_info['cell_output'] = result['output']
 
@@ -204,7 +179,7 @@ def get_card_full(request, card_name):
             'input': expression
         })
     except ValueError as e:
-        card_info = g.get_card_info(card_name, expression, variable)
+        card_info = EvaluateCard.get_card_info(card_name, unquotedVariable, unquotedExpression)
         return HttpResponse(render_to_string('card.html', {
             'cell': {
                 'title': card_info['title'],
