@@ -18,14 +18,13 @@ import sympy
 from sympy.solvers.diophantine import diophantine
 """
 
-
-def mathjax_latex(*args):
-    tex_code = []
+def makeLatexReadable(*args):
+    TeXcode = []
     for obj in args:
         if hasattr(obj, 'as_latex'):
-            tex_code.append(obj.as_latex())
+            TeXcode.append(obj.as_latex())
         else:
-            tex_code.append(latex(obj))
+            TeXcode.append(latex(obj))
 
     tag = '<script type="math/tex; mode=display">'
     if len(args) == 1:
@@ -39,24 +38,24 @@ def mathjax_latex(*args):
                   'data-output-repr="{}" data-approximation="{}">'.format(
                       repr(obj), latex(obj.evalf(15)))
 
-    tex_code = ''.join(tex_code)
+    TeXcode = ''.join(TeXcode)
 
-    return ''.join([tag, tex_code, '</script>'])
+    return ''.join([tag, TeXcode, '</script>'])
 
-class Evaluate_card(object):
+class UserInput(object):
 
-    def eval(self, s):
+    def changeToCards(self, s):
         result = None
 
         try:
-            result = self.eval_input(s)
+            result = self.evaluateUserInput(s)
         except TokenError:
             return [
                 {"title": "Input", "input": s},
                 {"title": "Error", "input": s, "error": "Invalid input"}
             ]
         except Exception as e:
-            return self.handle_error(s, e)
+            return self.handleInputError(s, e)
 
         if result:
             parsed, arguments, evaluator, evaluated = result
@@ -64,13 +63,13 @@ class Evaluate_card(object):
             cards = []
 
             try:
-                cards.extend(self.prepare_cards(parsed, arguments, evaluator, evaluated))
+                cards.extend(self.prepareCards(parsed, arguments, evaluator, evaluated))
             except ValueError as e:
-                return self.handle_error(s, e)
+                return self.handleInputError(s, e)
 
             return cards
 
-    def handle_error(self, s, e):
+    def handleInputError(self, s, e):
         if isinstance(e, SyntaxError):
             error = {
                 "msg": e.msg,
@@ -86,7 +85,7 @@ class Evaluate_card(object):
         elif isinstance(e, ValueError):
             return [
                 {"title": "Input", "input": s},
-                {"title": "Error", "input": s, "error": e.message}
+                {"title": "Error", "input": s, "error": e}
             ]
         else:
             trace = traceback.format_exc()
@@ -98,9 +97,8 @@ class Evaluate_card(object):
             ]
 
 
-    def eval_input(self, s):
+    def evaluateUserInput(self, s):
         namespace = {}
-        # https://late.am/post/2012/04/30/the-exec-statement-and-a-python-mystery.html
         exec(PREEXEC , namespace)
 
         evaluator = Eval(namespace)
@@ -124,7 +122,7 @@ class Evaluate_card(object):
 
         return parsed, arguments(parsed, evaluator), evaluator, evaluated
 
-    def get_cards(self, arguments, evaluator, evaluated):
+    def getCardsAndComponents(self, arguments, evaluator, evaluated):
         first_func_name = arguments[0]
         # is the top-level function call to a function such as factorint or
         # simplify?
@@ -153,15 +151,15 @@ class Evaluate_card(object):
 
         return components, cards, evaluated, (is_function and is_applied)
 
-    def prepare_cards(self, parsed, arguments, evaluator, evaluated):
-        components, cards, evaluated, is_function = self.get_cards(arguments, evaluator, evaluated)
+    def prepareCards(self, parsed, arguments, evaluator, evaluated):
+        components, cards, evaluated, is_function = self.getCardsAndComponents(arguments, evaluator, evaluated)
 
         if is_function:
             latex_input = ''.join(['<script type="math/tex; mode=display">',
                                    latexify(parsed, evaluator),
                                    '</script>'])
         else:
-            latex_input = mathjax_latex(evaluated)
+            latex_input = makeLatexReadable(evaluated)
 
         result = []
 
@@ -177,7 +175,7 @@ class Evaluate_card(object):
             result.append({
                 'title': 'Result',
                 'input': removeSymPy(parsed),
-                'output': format_by_type(evaluated, arguments, mathjax_latex)
+                'output': format_by_type(evaluated, arguments, makeLatexReadable)
             })
         else:
             var = components['variable']
@@ -186,7 +184,7 @@ class Evaluate_card(object):
             if is_function and not is_function_handled(arguments[0]):
                 result.append(
                     {"title": "Result", "input": "",
-                     "output": format_by_type(evaluated, arguments, mathjax_latex)})
+                     "output": format_by_type(evaluated, arguments, makeLatexReadable)})
 
             for card_name in cards:
                 card = get_card(card_name)
@@ -208,15 +206,15 @@ class Evaluate_card(object):
                     pass
         return result
 
-    def get_card_info(self, card_name, expression, variable):
+    def getCardInfo(self, card_name, expression, variable):
         card = get_card(card_name)
 
         if not card:
             raise KeyError
 
-        _, arguments, evaluator, evaluated = self.eval_input(expression)
+        _, arguments, evaluator, evaluated = self.evaluateUserInput(expression)
         variable = sympy.Symbol(variable)
-        components, cards, evaluated, _ = self.get_cards(arguments, evaluator, evaluated)
+        components, cards, evaluated, _ = self.getCardsAndComponents(arguments, evaluator, evaluated)
         components['variable'] = variable
 
         return {
@@ -226,21 +224,20 @@ class Evaluate_card(object):
             'pre_output': latex(card.pre_output_function(evaluated, variable))
         }
 
-    def eval_card(self, card_name, expression, variable, parameters):
+    def evaluateCard(self, card_name, expression, variable, parameters):
         card = get_card(card_name)
 
         if not card:
             raise KeyError
 
-        _, arguments, evaluator, evaluated = self.eval_input(expression)
+        _, arguments, evaluator, evaluated = self.evaluateUserInput(expression)
         variable = sympy.Symbol(variable)
-        components, cards, evaluated, _ = self.get_cards(arguments, evaluator, evaluated)
+        components, cards, evaluated, _ = self.getCardsAndComponents(arguments, evaluator, evaluated)
         components['variable'] = variable
-        # https://stackoverflow.com/questions/34803467/unexpected-exception-name-basestring-is-not-defined-when-invoking-ansible2
         evaluator.set(str(variable), variable)
         result = card.eval(evaluator, components, parameters)
 
         return {
             'value': repr(result),
-            'output': card.format_output(result, mathjax_latex)
+            'output': card.format_output(result, makeLatexReadable)
         }

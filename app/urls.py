@@ -16,9 +16,9 @@ urlpatterns = [
 
     path('card/<card_name>', views.returnResultAsCard),
 
-    path('card_info/<card_name>', views.get_card_info),
+    path('card_info/<card_name>', views.viewCardInformation),
 
-    path('card_full/<card_name>', views.get_card_full)
+    path('card_full/<card_name>', views.viewAllCards)
 
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs'

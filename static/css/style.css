@@ -556,13 +556,17 @@ ol.content {
 /* Phones/mobile devices */
 @media screen and (max-device-width:200px) {
 
+  .steps {
+    padding: 10px
+  }
+
   .result_card {
     -webkit-box-shadow: none;
     box-shadow: none;
     border: 2px solid #DDD;
     border-radius: 2px;
     margin: 3px;
-    padding: 5px;
+    padding: 15px;
   }
 
   .col {

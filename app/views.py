@@ -9,7 +9,7 @@ import django
 from chatbot.chat import chatbot_response
 
 from logic.utils import Eval
-from logic.logic import Evaluate_card, mathjax_latex
+from logic.logic import UserInput, makeLatexReadable
 from logic.resultsets import get_card, find_result_set
 
 from mathtutor import settings
@@ -49,14 +49,8 @@ ExamplesForHomePage = [
     ]),
 ]
 
-# https://devcenter.heroku.com/articles/getting-started-with-python#push-local-changes
-def index(request):
-    r = requests.get('http://httpbin.org/status/418')
-    print(r.text)
-    return HttpResponse('<pre>' + r.text + '</pre>')
 
 class MobileTextInput(forms.widgets.TextInput):
-    # https://stackoverflow.com/questions/52039654/django-typeerror-render-got-an-unexpected-keyword-argument-renderer
     def render(self, name, value, attrs=None, renderer=None):
         if attrs is None:
             attrs = {}
@@ -67,6 +61,7 @@ class MobileTextInput(forms.widgets.TextInput):
 class SearchForm(forms.Form):
     i = forms.CharField(required=False, widget=MobileTextInput())
 
+#render home page
 def index(request):
     form = SearchForm()
     user = None
@@ -79,21 +74,14 @@ def index(request):
         "examples": ExamplesForHomePage
         })
 
-def ReferenceGuide(request):
-    return render(request,"ReferenceGuide.html", {
-        "MEDIA_URL": settings.STATIC_URL,
-        "table_active": "selected",
-        })
-
-
+#return user input
 def input(request):
     if request.method == "GET":
         form = SearchForm(request.GET)
         if form.is_valid():
             input = form.cleaned_data["i"]
 
-            EvaluateCard = Evaluate_card()
-            Evaluated = EvaluateCard.eval(input)
+            Evaluated = UserInput().changeToCards(input)
 
             if not Evaluated:
                 Evaluated = [{
@@ -109,31 +97,28 @@ def input(request):
                 "MEDIA_URL": settings.STATIC_URL,
                 })
 
-def processVariablesExpressionsAndEvaluatedcard(request, card_name):
+def processVariablesAndExpressions(request, card_name):
     VariablesFromInput = request.GET.get('variable')
     ExpressionFromInput = request.GET.get('expression')
+
     if not VariablesFromInput or not ExpressionFromInput:
         raise Http404
 
-# https://stackoverflow.com/questions/8628152/url-decode-with-python-3/8628164
-
     unquotedVariable = urllib.parse.unquote(VariablesFromInput)
     unquotedExpression = urllib.parse.unquote(ExpressionFromInput)
-
-    EvaluateCard = Evaluate_card()
 
     parameters = {}
     for key, val in request.GET.items():
         parameters[key] = ''.join(val)
 
-    return EvaluateCard, unquotedVariable, unquotedExpression, parameters
+    return unquotedVariable, unquotedExpression, parameters
 
 
 def returnResultAsCard(request, card_name):
-    EvaluateCard, unquotedVariable, unquotedExpression, parameters = processVariablesExpressionsAndEvaluatedcard(request, card_name)
+    unquotedVariable, unquotedExpression, parameters = processVariablesAndExpressions(request, card_name)
 
     try:
-        result = EvaluateCard.eval_card(card_name, unquotedExpression, unquotedVariable, parameters)
+        result = UserInput().evaluateCard(card_name, unquotedExpression, unquotedVariable, parameters)
     except ValueError as e:
         return HttpResponse(json.dumps({
             'error': e.message
@@ -147,11 +132,11 @@ def returnResultAsCard(request, card_name):
 
     return HttpResponse(json.dumps(result), content_type="application/json")
 
-def get_card_info(request, card_name):
-    EvaluateCard, unquotedVariable, unquotedExpression, _ = processVariablesExpressionsAndEvaluatedcard(request, card_name)
+def viewCardInformation(request, card_name):
+    unquotedVariable, unquotedExpression, _ = processVariablesAndExpressions(request, card_name)
 
     try:
-        result = EvaluateCard.get_card_info(card_name, unquotedVariable, unquotedExpression)
+        result = UserInput().getCardInfo(card_name, unquotedVariable, unquotedExpression)
     except ValueError as e:
         return HttpResponse(json.dumps({
             'error': e.message
@@ -159,18 +144,18 @@ def get_card_info(request, card_name):
     except:
         trace = traceback.format_exc(5)
         return HttpResponse(json.dumps({
-            'error': ('There was an error in Gamma. For reference'
+            'error': ('There was an error. For reference'
                       'the last five traceback entries are: ' + trace)
         }), content_type="application/json")
 # https://github.com/crucialfelix/django-ajax-selects/pull/82/files
     return HttpResponse(json.dumps(result), content_type="application/json")
 
-def get_card_full(request, card_name):
-    EvaluateCard, unquotedVariable, unquotedExpression, parameters = processVariablesExpressionsAndEvaluatedcard(request, card_name)
+def viewAllCards(request, card_name):
+    unquotedVariable, unquotedExpression, parameters = processVariablesAndExpressions(request, card_name)
 
     try:
-        card_info = EvaluateCard.get_card_info(card_name, unquotedVariable, unquotedExpression)
-        result = EvaluateCard.eval_card(card_name, unquotedVariable, unquotedExpression, parameters)
+        card_info = UserInput().getCardInfo(card_name, unquotedVariable, unquotedExpression)
+        result = UserInput().evaluateCard(card_name, unquotedVariable, unquotedExpression, parameters)
         card_info['card'] = card_name
         card_info['cell_output'] = result['output']
 
@@ -179,7 +164,7 @@ def get_card_full(request, card_name):
             'input': expression
         })
     except ValueError as e:
-        card_info = EvaluateCard.get_card_info(card_name, unquotedVariable, unquotedExpression)
+        card_info = UserInput().getCardInfo(card_name, unquotedVariable, unquotedExpression)
         return HttpResponse(render_to_string('card.html', {
             'cell': {
                 'title': card_info['title'],
@@ -206,6 +191,13 @@ def get_card_full(request, card_name):
     response['Access-Control-Allow-Headers'] = 'Content-Type, X-Requested-With'
 
     return response
+
+
+def ReferenceGuide(request):
+    return render(request,"ReferenceGuide.html", {
+        "MEDIA_URL": settings.STATIC_URL,
+        "table_active": "selected",
+        })
 
 class ChatBotAppView(TemplateView):
     template_name = 'app.html'

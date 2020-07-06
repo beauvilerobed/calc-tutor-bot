@@ -17,7 +17,7 @@ body {
 
   /* https://www.w3schools.com/howto/howto_js_filter_lists.asp */
 /* filter/Search List */
-#myInput {
+#searchForTable {
   background-image: url('/css/searchicon.png'); /* Add a search icon to input */
   background-position: 10px 12px; /* Position the search icon */
   background-repeat: no-repeat; /* Do not repeat the icon image */

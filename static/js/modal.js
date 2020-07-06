@@ -1,4 +1,3 @@
-// https://stackoverflow.com/questions/7151904/document-getelementbyid-returning-null
 $(document).ready(function() {
 // Get the modal
 var modal = document.getElementById("myModal");
@@ -21,10 +20,6 @@ window.console&&console.log(dis2);
 
 var dis3 = document.getElementsByClassName("result_card_error");
 window.console&&console.log(dis3[0]);
-
-// if(dis){
-//   window.console&&console.log(dis2[2]);
-// }
 
 // When the user clicks the button, open the modal 
 btn.onclick = function() {

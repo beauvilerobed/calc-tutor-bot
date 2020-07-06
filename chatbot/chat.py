@@ -64,6 +64,6 @@ def chatbot_response(msg):
     res = getResponse(ints, intents)
     return res
 
-#get started
-msg = "hell0"
+#iinitiate chatbot API
+msg = "Hello World!"
 chatbot_response(msg)
