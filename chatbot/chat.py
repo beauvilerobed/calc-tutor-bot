@@ -64,7 +64,6 @@ def chatbot_response(msg):
     res = getResponse(ints, intents)
     return res
 
-# https://github.com/marcogdepinto/Deep-learning-model-deploy-with-django/blob/a3b48c30c0cd4f27710cf4c064b7775023abb29d/manage.py
-# this fixed an issue with the chatbot_response
-msg = "hell"
+#get started
+msg = "hell0"
 chatbot_response(msg)

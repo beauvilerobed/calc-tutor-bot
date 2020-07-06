@@ -6,7 +6,7 @@ from django.views.generic.base import TemplateView
 from django.views.generic import View
 import django
 
-from chat import chatbot_response
+from chatbot.chat import chatbot_response
 
 from logic.utils import Eval
 from logic.logic import Evaluate_card, mathjax_latex
