@@ -3,13 +3,6 @@
 # admin.autodiscover()
 from django.urls import path
 from django.conf.urls import url, include
-
-
-# A single dot means that the module or package referenced is 
-# in the same directory as the current location. Two dots mean 
-# that it is in the parent directory of the current location—that i
-# s, the directory above. Three dots mean that it is in the 
-# grandparent directory, and so on.
 #https://realpython.com/absolute-vs-relative-python-imports/
 from . import views
 

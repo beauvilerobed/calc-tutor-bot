@@ -8,7 +8,6 @@ import django
 
 from chat import chatbot_response
 
-import sympy
 from logic.utils import Eval
 from logic.logic import Evaluate_card, mathjax_latex
 from logic.resultsets import get_card, find_result_set

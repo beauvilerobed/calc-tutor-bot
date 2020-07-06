@@ -2,8 +2,8 @@ import sys
 import traceback
 import collections
 from logic.utils import Eval, latexify, arguments, removeSymPy, \
-    custom_implicit_transformation, synonyms, OTHER_SYMPY_FUNCTIONS, \
-    close_matches
+    custom_implicit_transformation, synonyms, OTHER_SYMPY_FUNCTIONS
+    # close_matches
 from logic.resultsets import find_result_set, get_card, format_by_type, \
     is_function_handled
 from sympy import latex, series, sympify, solve, Derivative, \
@@ -64,12 +64,12 @@ class Evaluate_card(object):
 
             cards = []
 
-            close_match = close_matches(s, sympy.__dict__)
-            if close_match:
-                cards.append({
-                    "ambiguity": close_match,
-                    "description": ""
-                })
+            # close_match = close_matches(s, sympy.__dict__)
+            # if close_match:
+            #     cards.append({
+            #         "ambiguity": close_match,
+            #         "description": ""
+            #     })
 
             try:
                 cards.extend(self.prepare_cards(parsed, arguments, evaluator, evaluated))
