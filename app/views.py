@@ -50,16 +50,16 @@ ExamplesForHomePage = [
 ]
 
 
-class MobileTextInput(forms.widgets.TextInput):
+class TextInputWidget(forms.widgets.TextInput):
     def render(self, name, value, attrs=None, renderer=None):
         if attrs is None:
             attrs = {}
         attrs['autocorrect'] = 'off'
         attrs['autocapitalize'] = 'off'
-        return super(MobileTextInput, self).render(name, value, attrs)
+        return super(TextInputWidget, self).render(name, value, attrs)
 
 class SearchForm(forms.Form):
-    i = forms.CharField(required=False, widget=MobileTextInput())
+    i = forms.CharField(required=False, widget=TextInputWidget())
 
 #render home page
 def index(request):

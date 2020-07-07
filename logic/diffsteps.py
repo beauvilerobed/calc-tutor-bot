@@ -1,6 +1,5 @@
 import sympy
 import collections
-# https://docs.python.org/3/library/functools.html#functools.reduce
 import functools
 
 from logic import stepprinter
@@ -9,6 +8,8 @@ from logic.stepprinter import functionnames, replace_u_var
 from sympy.core.function import AppliedUndef
 from sympy.functions.elementary.trigonometric import TrigonometricFunction
 from sympy.strategies.core import switch, identity
+
+
 def Rule(name, props=""):
     return collections.namedtuple(name, props + " context symbol")
 
