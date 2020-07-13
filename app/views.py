@@ -6,7 +6,7 @@ from django.views.generic.base import TemplateView
 from django.views.generic import View
 import django
 
-from chatbot.chat import chatbot_response
+from chatbot.chat import chatbotResponse
 
 from logic.utils import Eval
 from logic.logic import UserInput, makeLatexReadable

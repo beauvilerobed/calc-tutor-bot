@@ -530,8 +530,6 @@ class HTMLPrinter(DiffPrinter, stepprinter.HTMLPrinter):
                     self.append(self.format_math_display(simp) + '</ol></div>')
         self.lines.append('</ol>')
         self.level = 0
-        # self.append('The answer is:')
-        # self.append(self.format_math_display(answer))
         return '\n'.join(self.lines)
 
 def print_html_steps(function, symbol):
