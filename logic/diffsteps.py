@@ -13,6 +13,7 @@ from sympy.strategies.core import switch, identity
 def Rule(name, props=""):
     return collections.namedtuple(name, props + " context symbol")
 
+
 ConstantRule = Rule("ConstantRule", "number")
 ConstantTimesRule = Rule("ConstantTimesRule", "constant other substep")
 PowerRule = Rule("PowerRule", "base exp")
@@ -31,12 +32,15 @@ RewriteRule = Rule("RewriteRule", "rewritten substep")
 DerivativeInfo = collections.namedtuple('DerivativeInfo', 'expr symbol')
 
 evaluators = {}
+
+
 def evaluates(rule):
     def _evaluates(func):
         func.rule = rule
         evaluators[rule] = func
         return func
     return _evaluates
+
 
 def power_rule(derivative):
     expr, symbol = derivative.expr, derivative.symbol
@@ -69,14 +73,17 @@ def power_rule(derivative):
     else:
         return DontKnowRule(expr, symbol)
 
+
 def add_rule(derivative):
     expr, symbol = derivative.expr, derivative.symbol
     return AddRule([diff_steps(arg, symbol) for arg in expr.args],
                    expr, symbol)
 
+
 def constant_rule(derivative):
     expr, symbol = derivative.expr, derivative.symbol
     return ConstantRule(expr, expr, symbol)
+
 
 def mul_rule(derivative):
     expr, symbol = derivative
@@ -95,6 +102,7 @@ def mul_rule(derivative):
                        diff_steps(denominator, symbol), expr, symbol)
 
     return MulRule(terms, [diff_steps(g, symbol) for g in terms], expr, symbol)
+
 
 def trig_rule(derivative):
     expr, symbol = derivative
@@ -142,6 +150,7 @@ def trig_rule(derivative):
     else:
         return DontKnowRule(f, symbol)
 
+
 def exp_rule(derivative):
     expr, symbol = derivative
     exp = expr.args[0]
@@ -152,6 +161,7 @@ def exp_rule(derivative):
         f = sympy.exp(u)
         return ChainRule(ExpRule(f, sympy.E, f, u),
                          exp, u, diff_steps(exp, symbol), expr, symbol)
+
 
 def log_rule(derivative):
     expr, symbol = derivative
@@ -167,31 +177,38 @@ def log_rule(derivative):
             return ChainRule(LogRule(u, base, sympy.log(u, base), u),
                              arg, u, diff_steps(arg, symbol), expr, symbol)
 
+
 def function_rule(derivative):
     return FunctionRule(derivative.expr, derivative.symbol)
+
 
 @evaluates(ConstantRule)
 def eval_constant(*args):
     return 0
 
+
 @evaluates(ConstantTimesRule)
 def eval_constanttimes(constant, other, substep, expr, symbol):
     return constant * diff(substep)
+
 
 @evaluates(AddRule)
 def eval_add(substeps, expr, symbol):
     results = [diff(step) for step in substeps]
     return sum(results)
 
+
 @evaluates(DivRule)
 def eval_div(numer, denom, numerstep, denomstep, expr, symbol):
     d_numer = diff(numerstep)
     d_denom = diff(denomstep)
-    return (denom * d_numer - numer * d_denom) / (denom **2)
+    return (denom * d_numer - numer * d_denom) / (denom ** 2)
+
 
 @evaluates(ChainRule)
 def eval_chain(substep, inner, u_var, innerstep, expr, symbol):
     return diff(substep).subs(u_var, inner) * diff(innerstep)
+
 
 @evaluates(PowerRule)
 @evaluates(ExpRule)
@@ -220,6 +237,7 @@ def eval_default(*args):
     rule = func.func(*substitutions).diff(symbol)
     return rule.subs(mapping)
 
+
 @evaluates(MulRule)
 def eval_mul(terms, substeps, expr, symbol):
     diffs = list(map(diff, substeps))
@@ -233,17 +251,21 @@ def eval_mul(terms, substeps, expr, symbol):
         result += subresult
     return result
 
+
 @evaluates(TrigRule)
 def eval_default_trig(*args):
     return sympy.trigsimp(eval_default(*args))
+
 
 @evaluates(RewriteRule)
 def eval_rewrite(rewritten, substep, expr, symbol):
     return diff(substep)
 
+
 @evaluates(AlternativeRule)
 def eval_alternative(alternatives, expr, symbol):
     return diff(alternatives[1])
+
 
 def diff_steps(expr, symbol):
     deriv = DerivativeInfo(expr, symbol)
@@ -272,11 +294,13 @@ def diff_steps(expr, symbol):
         'constant': constant_rule
     })(deriv)
 
+
 def diff(rule):
     try:
         return evaluators[rule.__class__](*rule)
     except KeyError:
         raise ValueError("Cannot evaluate derivative")
+
 
 class DiffPrinter(object):
     def __init__(self, rule):
@@ -332,7 +356,8 @@ class DiffPrinter(object):
                         "is <strong>the</strong> constant times the derivative of the function.")
             with self.new_level():
                 self.print_rule(rule.substep)
-            self.append('<div class="collapsible"><h2>open answer</h2><ol class="content">So, the result is: ')
+            self.append(
+                '<div class="collapsible"><h2>open answer</h2><ol class="content">So, the result is: ')
             self.append(self.format_math(diff(rule)) + '</ol></div>')
 
     def print_Add(self, rule):
@@ -342,7 +367,8 @@ class DiffPrinter(object):
             with self.new_level():
                 for substep in rule.substeps:
                     self.print_rule(substep)
-            self.append('<div class="collapsible"><h2>open answer</h2><ol class="content">The result is: ')
+            self.append(
+                '<div class="collapsible"><h2>open answer</h2><ol class="content">The result is: ')
             self.append(self.format_math(diff(rule)) + '</ol></div>')
 
     def print_Mul(self, rule):
@@ -351,8 +377,9 @@ class DiffPrinter(object):
                 self.format_math(rule.context)))
 
             fnames = list(map(lambda n: sympy.Function(n)(rule.symbol),
-                         functionnames(len(rule.terms))))
-            derivatives = list(map(lambda f: sympy.Derivative(f, rule.symbol), fnames))
+                              functionnames(len(rule.terms))))
+            derivatives = list(
+                map(lambda f: sympy.Derivative(f, rule.symbol), fnames))
             ruleform = []
             for index in range(len(rule.terms)):
                 buf = []
@@ -362,12 +389,12 @@ class DiffPrinter(object):
                     else:
                         buf.append(fnames[i])
                 # https://docs.python.org/3/library/functools.html#functools.reduce
-                #https://stackoverflow.com/questions/6800481/python-map-object-is-not-subscriptable
-                ruleform.append(functools.reduce(lambda a,b: a*b, buf))
+                # https://stackoverflow.com/questions/6800481/python-map-object-is-not-subscriptable
+                ruleform.append(functools.reduce(lambda a, b: a*b, buf))
             self.append(self.format_math_display(
-                sympy.Eq(sympy.Derivative(functools.reduce(lambda a,b: a*b, fnames),
-                                        rule.symbol),
-                       sum(ruleform))))
+                sympy.Eq(sympy.Derivative(functools.reduce(lambda a, b: a*b, fnames),
+                                          rule.symbol),
+                         sum(ruleform))))
 
             for fname, deriv, term, substep in zip(fnames, derivatives,
                                                    rule.terms, rule.substeps):
@@ -378,7 +405,8 @@ class DiffPrinter(object):
                 with self.new_level():
                     self.print_rule(substep)
 
-            self.append('<div class="collapsible"><h2>open answer</h2><ol class="content">The result is:')
+            self.append(
+                '<div class="collapsible"><h2>open answer</h2><ol class="content">The result is:')
             self.append(self.format_math(diff(rule)) + '</ol></div>')
 
     def print_Div(self, rule):
@@ -396,18 +424,22 @@ class DiffPrinter(object):
             self.append(self.format_math_display(qrule))
             self.append("{} and {}.".format(self.format_math(sympy.Eq(ff, f)),
                                             self.format_math(sympy.Eq(gg, g))))
-            self.append("Find {}:".format(self.format_math(ff.diff(rule.symbol))))
+            self.append("Find {}:".format(
+                self.format_math(ff.diff(rule.symbol))))
             with self.new_level():
                 self.print_rule(rule.numerstep)
-            self.append("Find {}:".format(self.format_math(gg.diff(rule.symbol))))
+            self.append("Find {}:".format(
+                self.format_math(gg.diff(rule.symbol))))
             with self.new_level():
                 self.print_rule(rule.denomstep)
-            self.append('<div class="collapsible"><h2>open answer</h2><ol class="content">Now plug in to the quotient rule to get:')
+            self.append(
+                '<div class="collapsible"><h2>open answer</h2><ol class="content">Now plug in to the quotient rule to get:')
             self.append(self.format_math(diff(rule)) + '</ol></div>')
 
     def print_Chain(self, rule):
         with self.new_step(), self.new_u_vars() as (u, du):
-            self.append("Let {}.".format(self.format_math(sympy.Eq(u, rule.inner))))
+            self.append("Let {}.".format(
+                self.format_math(sympy.Eq(u, rule.inner))))
             self.print_rule(replace_u_var(rule.substep, rule.u_var, u))
         with self.new_step():
             if isinstance(rule.innerstep, FunctionRule):
@@ -423,7 +455,8 @@ class DiffPrinter(object):
                             sympy.Derivative(rule.inner, rule.symbol))))
                 with self.new_level():
                     self.print_rule(rule.innerstep)
-                self.append('<div class="collapsible"><h2>open answer</h2><ol class="content">The result of the chain rule is:')
+                self.append(
+                    '<div class="collapsible"><h2>open answer</h2><ol class="content">The result of the chain rule is:')
                 self.append(self.format_math(diff(rule)) + '</ol></div>')
 
     def print_Trig(self, rule):
@@ -433,9 +466,11 @@ class DiffPrinter(object):
             elif isinstance(rule.f, sympy.cos):
                 self.append("The derivative of cosine is negative sine:")
             elif isinstance(rule.f, sympy.sec):
-                self.append("The derivative of secant is secant times tangent:")
+                self.append(
+                    "The derivative of secant is secant times tangent:")
             elif isinstance(rule.f, sympy.csc):
-                self.append("The derivative of cosecant is negative cosecant times cotangent:")
+                self.append(
+                    "The derivative of cosecant is negative cosecant times cotangent:")
             self.append("{}".format(
                 self.format_math_display(sympy.Eq(
                     sympy.Derivative(rule.f, rule.symbol),
@@ -449,7 +484,7 @@ class DiffPrinter(object):
             else:
                 self.append(
                     self.format_math(sympy.Eq(sympy.Derivative(rule.f, rule.symbol),
-                                            diff(rule))))
+                                              diff(rule))))
 
     def print_Log(self, rule):
         with self.new_step():
@@ -489,13 +524,14 @@ class DiffPrinter(object):
             self.append("Trivial:")
             self.append(self.format_math_display(
                 sympy.Eq(sympy.Derivative(rule.context, rule.symbol),
-                       diff(rule))))
+                         diff(rule))))
 
     def print_DontKnow(self, rule):
         with self.new_step():
             self.append("Don't know the steps in finding this derivative.")
             self.append("But the derivative is")
             self.append(self.format_math_display(diff(rule)))
+
 
 class HTMLPrinter(DiffPrinter, stepprinter.HTMLPrinter):
     def __init__(self, rule):
@@ -526,11 +562,13 @@ class HTMLPrinter(DiffPrinter, stepprinter.HTMLPrinter):
             if simp != answer:
                 answer = simp
                 with self.new_step():
-                    self.append('<div class="collapsible"><h2>open answer</h2><ol class="content">Now simplify to get:')
+                    self.append(
+                        '<div class="collapsible"><h2>open answer</h2><ol class="content">Now simplify to get:')
                     self.append(self.format_math_display(simp) + '</ol></div>')
         self.lines.append('</ol>')
         self.level = 0
         return '\n'.join(self.lines)
+
 
 def print_html_steps(function, symbol):
     a = HTMLPrinter(diff_steps(function, symbol))

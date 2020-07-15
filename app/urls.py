@@ -3,7 +3,6 @@
 # admin.autodiscover()
 from django.urls import path
 from django.conf.urls import url, include
-#https://realpython.com/absolute-vs-relative-python-imports/
 from . import views
 
 app_name = 'app'

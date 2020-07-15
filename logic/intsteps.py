@@ -14,6 +14,8 @@ from sympy.integrals.manualintegrate import (
 # Need this to break loops
 # TODO: add manualintegrate flag to integrate
 _evaluating = None
+
+
 @evaluates(DontKnowRule)
 def eval_dontknow(context, symbol):
     global _evaluating
@@ -38,13 +40,16 @@ def contains_dont_know(rule):
                     return True
     return False
 
+
 def filter_unknown_alternatives(rule):
     if isinstance(rule, AlternativeRule):
-        alternatives = list(filter(lambda r: not contains_dont_know(r), rule.alternatives))
+        alternatives = list(
+            filter(lambda r: not contains_dont_know(r), rule.alternatives))
         if not alternatives:
             alternatives = rule.alternatives
         return AlternativeRule(alternatives, rule.context, rule.symbol)
     return rule
+
 
 class IntegralPrinter(object):
     def __init__(self, rule):
@@ -92,7 +97,7 @@ class IntegralPrinter(object):
             self.append(
                 self.format_math_display(
                     sympy.Eq(sympy.Integral(rule.constant, rule.symbol),
-                           _manualintegrate(rule))))
+                             _manualintegrate(rule))))
 
     def print_ConstantTimes(self, rule):
         with self.new_step():
@@ -105,8 +110,10 @@ class IntegralPrinter(object):
 
             with self.new_level():
                 self.print_rule(rule.substep)
-            self.append('<div class="collapsible"><h2>open answer</h2><ol class="content">So, the result is: ')
-            self.append(self.format_math(_manualintegrate(rule)) + '</ol></div>')
+            self.append(
+                '<div class="collapsible"><h2>open answer</h2><ol class="content">So, the result is: ')
+            self.append(self.format_math(
+                _manualintegrate(rule)) + '</ol></div>')
 
     def print_Power(self, rule):
         with self.new_step():
@@ -119,7 +126,7 @@ class IntegralPrinter(object):
             self.append(
                 self.format_math_display(
                     sympy.Eq(sympy.Integral(rule.context, rule.symbol),
-                           _manualintegrate(rule))))
+                             _manualintegrate(rule))))
 
     def print_Add(self, rule):
         with self.new_step():
@@ -127,8 +134,11 @@ class IntegralPrinter(object):
             for substep in rule.substeps:
                 with self.new_level():
                     self.print_rule(substep)
-            self.append('<div class="collapsible"><h2>open answer</h2><ol class="content">The result is: ')
-            self.append(self.format_math(_manualintegrate(rule)) + '</ol></div>')
+            self.append(
+                '<div class="collapsible"><h2>open answer</h2><ol class="content">The result is: ')
+            self.append(self.format_math(
+                _manualintegrate(rule)) + '</ol></div>')
+
     def print_U(self, rule):
         with self.new_step(), self.new_u_vars() as (u, du):
             # commutative always puts the symbol at the end when printed
@@ -136,27 +146,32 @@ class IntegralPrinter(object):
             self.append("Let {}.".format(
                 self.format_math(sympy.Eq(u, rule.u_func))))
             self.append("Then let {} and substitute {}:".format(
-                self.format_math(sympy.Eq(du, rule.u_func.diff(rule.symbol) * dx)),
+                self.format_math(
+                    sympy.Eq(du, rule.u_func.diff(rule.symbol) * dx)),
                 self.format_math(rule.constant * du)
             ))
 
-            integrand = rule.constant * rule.substep.context.subs(rule.u_var, u)
+            integrand = rule.constant * \
+                rule.substep.context.subs(rule.u_var, u)
             self.append(self.format_math_display(
                 sympy.Integral(integrand, u)))
 
             with self.new_level():
-                self.print_rule(replace_u_var(rule.substep, rule.symbol.name, u))
+                self.print_rule(replace_u_var(
+                    rule.substep, rule.symbol.name, u))
 
             self.append('<div class="collapsible"><h2>open answer</h2><ol class="content">Now replace {} to get:'.format(
                 self.format_math(u)))
 
-            self.append(self.format_math_display(_manualintegrate(rule)) + '</ol></div>')
+            self.append(self.format_math_display(
+                _manualintegrate(rule)) + '</ol></div>')
 
     def print_Parts(self, rule):
         with self.new_step():
             self.append("Use integration by parts:")
 
-            u, v, du, dv = map(lambda f: sympy.Function(f)(rule.symbol), 'u v du dv'.split())
+            u, v, du, dv = map(lambda f: sympy.Function(
+                f)(rule.symbol), 'u v du dv'.split())
             self.append(self.format_math_display(
                 r"""\int \operatorname{u} \operatorname{dv}
                 = \operatorname{u}\operatorname{v} -
@@ -192,13 +207,15 @@ class IntegralPrinter(object):
                 sign = 1
                 for rl in rule.parts_rules:
                     with self.new_step():
-                        self.append("For the integrand {}:".format(self.format_math(current_integrand)))
+                        self.append("For the integrand {}:".format(
+                            self.format_math(current_integrand)))
                         self.append("Let {} and let {}.".format(
                             self.format_math(sympy.Eq(u, rl.u)),
                             self.format_math(sympy.Eq(dv, rl.dv))
                         ))
 
-                        v_f, du_f = _manualintegrate(rl.v_step), rl.u.diff(rule.symbol)
+                        v_f, du_f = _manualintegrate(
+                            rl.v_step), rl.u.diff(rule.symbol)
 
                         total_result += sign * rl.u * v_f
                         current_integrand = v_f * du_f
@@ -215,7 +232,8 @@ class IntegralPrinter(object):
                                 "move it to one side:")
                     self.append("{}".format(
                         self.format_math_display(sympy.Eq(
-                            (1 - rule.coefficient) * sympy.Integral(rule.context, rule.symbol),
+                            (1 - rule.coefficient) *
+                            sympy.Integral(rule.context, rule.symbol),
                             total_result
                         ))
                     ))
@@ -226,7 +244,6 @@ class IntegralPrinter(object):
                             _manualintegrate(rule)
                         ))
                     ))
-
 
     def print_Trig(self, rule):
         with self.new_step():
@@ -242,18 +259,19 @@ class IntegralPrinter(object):
 
             self.append(self.format_math_display(
                 sympy.Eq(sympy.Integral(rule.context, rule.symbol),
-                       _manualintegrate(rule))))
+                         _manualintegrate(rule))))
 
     def print_Exp(self, rule):
         with self.new_step():
             if rule.base == sympy.E:
-                self.append("The integral of the exponential function is itself.")
+                self.append(
+                    "The integral of the exponential function is itself.")
             else:
                 self.append("The integral of an exponential function is itself"
                             " divided by the natural logarithm of the base.")
             self.append(self.format_math_display(
                 sympy.Eq(sympy.Integral(rule.context, rule.symbol),
-                       _manualintegrate(rule))))
+                         _manualintegrate(rule))))
 
     def print_Log(self, rule):
         with self.new_step():
@@ -280,7 +298,8 @@ class IntegralPrinter(object):
         with self.new_step():
             self.append("Don't know the steps in finding this integral.")
             self.append("But the integral is")
-            self.append(self.format_math_display(sympy.integrate(rule.context, rule.symbol)))
+            self.append(self.format_math_display(
+                sympy.integrate(rule.context, rule.symbol)))
 
 
 class HTMLPrinter(IntegralPrinter, stepprinter.HTMLPrinter):
@@ -321,16 +340,19 @@ class HTMLPrinter(IntegralPrinter, stepprinter.HTMLPrinter):
             if simp != answer:
                 answer = simp
                 with self.new_step():
-                    self.append('<div class="collapsible"><h2>open answer</h2><ol class="content">Now simplify:')
+                    self.append(
+                        '<div class="collapsible"><h2>open answer</h2><ol class="content">Now simplify:')
                     self.append(self.format_math_display(simp) + '</ol></div>')
             with self.new_step():
-                self.append('<div class="collapsible"><h2>open answer</h2><ol class="content">Add the constant of integration to get:')
+                self.append(
+                    '<div class="collapsible"><h2>open answer</h2><ol class="content">Add the constant of integration to get:')
                 self.append(self.format_math_constant(answer) + '</ol></div>')
         self.lines.append('</ol>')
         self.level = 0
         # self.append('The answer is:')
         # self.append(self.format_math_constant(answer))
         return '\n'.join(self.lines)
+
 
 def print_html_steps(function, symbol):
     rule = integral_steps(function, symbol)

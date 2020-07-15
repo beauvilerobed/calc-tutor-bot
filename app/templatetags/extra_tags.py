@@ -1,13 +1,14 @@
+import time
 from django import template
 import urllib
 import urllib.parse
 register = template.Library()
 
-import time
 
 @register.inclusion_tag('card.html')
 def show_card(cell, input):
     return {'cell': cell, 'input': input}
+
 
 class QueryNode(template.Node):
     def __init__(self, query):
@@ -17,20 +18,22 @@ class QueryNode(template.Node):
             self.query = template.Variable(query)
 
     def render(self, context):
-        if isinstance(self.query, unicode):
-            return "/input/?i=" + urllib.quote(self.query[1:-1])
+        if isinstance(self.query):
+            return "/input/?i=" + urllib.parse.quote(self.query[1:-1])
         else:
-            return "/input/?i=" + urllib.quote(self.query.resolve(context))
+            return "/input/?i=" + urllib.parse.quote(self.query.resolve(context))
+
 
 @register.tag(name='make_example')
 def do_make_example(parser, token):
     try:
-        tag_name, example = token.split_contents()
+        _, example = token.split_contents()
     except ValueError:
         raise template.TemplateSyntaxError(
             "%r tag requires a single argument" % token.contents.split()[0])
 
     return ExampleLinkNode(example)
+
 
 class ExampleLinkNode(template.Node):
     def __init__(self, example):

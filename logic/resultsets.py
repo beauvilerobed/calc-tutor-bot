@@ -379,14 +379,14 @@ def trim(docstring):
     # and split into a list of lines:
     lines = docstring.expandtabs().splitlines()
     # Determine minimum indentation (first line doesn't count):
-    indent = sys.maxint
+    indent = sys.maxsize
     for line in lines[1:]:
         stripped = line.lstrip()
         if stripped:
             indent = min(indent, len(line) - len(stripped))
     # Remove indentation (first line is special):
     trimmed = [lines[0].strip()]
-    if indent < sys.maxint:
+    if indent < sys.maxsize:
         for line in lines[1:]:
             trimmed.append(line[indent:].rstrip())
     # Strip off trailing and leading blank lines:
@@ -433,10 +433,6 @@ all_cards = {
         format_input_function=format_integral
     ),
 
-    # 'diff': ResultCard("Derivatives",
-    #                    "diff(%s, {_var})",
-    #                    sympy.Derivative),
-
     'diffsteps': FakeResultCard(
         "Derivative Steps",
         "diff(%s, {_var})",
@@ -464,11 +460,6 @@ all_cards = {
 def get_card(name):
     return all_cards.get(name, None)
 
-# all_cards['integral_alternate'] = MultiResultCard(
-#     "Antiderivative forms",
-#     get_card('integral'),
-#     get_card('integral_manual')
-# )
 
 all_cards['integral_alternate_fake'] = MultiResultCard(
     "I don't know the steps but here is the answer",

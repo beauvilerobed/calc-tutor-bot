@@ -26,25 +26,29 @@ from django.views.decorators.csrf import csrf_exempt
 # https://devcenter.heroku.com/articles/getting-started-with-python#push-local-changes
 import requests
 
-ExamplesForHomePage = [
+examplesForHomePage = [
     ('Calculus', [
         ['Derivatives', [
-            ('Learn how to derive the product rule for multiple functions', 'diff(f(x)*g(x)*h(x)*k(x))'),
+            ('Learn how to derive the product rule for multiple functions',
+             'diff(f(x)*g(x)*h(x)*k(x))'),
             ('Learn how to derive the  the quotient rule', 'diff(f(x)/g(x))'),
             ('Learn how to use power rule and Chain rule', 'diff(cos(x)^7, x)'),
-            ('See the steps for derivatives of this function', 'diff(x^4 / (1 + (tan(sin(x))))^2)'),
+            ('See the steps for derivatives of this function',
+             'diff(x^4 / (1 + (tan(sin(x))))^2)'),
             ('Learn multiple ways to derive functions', 'diff(cot(y), y)'),
             ('Learn to differentiate implicitly', 'diff(z*x^4 - tan(z), z)'),
 
         ]],
         ['Antiderivatives', [
-            ('Learn how to integrate this function','integrate(cot(x))'),
+            ('Learn how to integrate this function', 'integrate(cot(x))'),
             ('Learn how to integrate multiple variables', 'integrate(x^100 + x, x)'),
             ('Learn common integrals', 'integrate(1/z, z)'),
-            ('Learn steps for these integrals', 'integrate(exp(2x) / (1 + exp(x)), x)'),
+            ('Learn steps for these integrals',
+             'integrate(exp(2x) / (1 + exp(x)), x)'),
             'integrate(1 /(x^2-x-2),x)',
             'integrate((2+3/x)**2)',
-            ('And if we don\'t know, we will let you know' , 'integrate(1/sqrt(x^2+1), x)'),
+            ('And if we don\'t know, we will let you know',
+             'integrate(1/sqrt(x^2+1), x)'),
         ]],
     ]),
 ]
@@ -58,44 +62,47 @@ class TextInputWidget(forms.widgets.TextInput):
         attrs['autocapitalize'] = 'off'
         return super(TextInputWidget, self).render(name, value, attrs)
 
+
 class SearchForm(forms.Form):
     i = forms.CharField(required=False, widget=TextInputWidget())
 
-#render home page
+# render home page
+
+
 def index(request):
     form = SearchForm()
-    user = None
 
-    history = None
-
-    return render(request,"index.html", {
+    return render(request, "index.html", {
         "form": form,
         "MEDIA_URL": settings.STATIC_URL,
-        "examples": ExamplesForHomePage
-        })
+        "examples": examplesForHomePage
+    })
 
-#return user input
+# return user input
+
+
 def input(request):
     if request.method == "GET":
         form = SearchForm(request.GET)
         if form.is_valid():
             input = form.cleaned_data["i"]
 
-            Evaluated = UserInput().changeToCards(input)
+            evaluated = UserInput().changeToCards(input)
 
-            if not Evaluated:
-                Evaluated = [{
+            if not evaluated:
+                evaluated = [{
                     "title": "Input",
                     "input": input,
                     "output": "Can't handle the input."
                 }]
 
-            return render(request,"result.html", {
+            return render(request, "result.html", {
                 "input": input,
-                "result": Evaluated,
+                "result": evaluated,
                 "form": form,
                 "MEDIA_URL": settings.STATIC_URL,
-                })
+            })
+
 
 def processVariablesAndExpressions(request, card_name):
     VariablesFromInput = request.GET.get('variable')
@@ -115,13 +122,15 @@ def processVariablesAndExpressions(request, card_name):
 
 
 def returnResultAsCard(request, card_name):
-    unquotedVariable, unquotedExpression, parameters = processVariablesAndExpressions(request, card_name)
+    unquotedVariable, unquotedExpression, parameters = processVariablesAndExpressions(
+        request, card_name)
 
     try:
-        result = UserInput().evaluateCard(card_name, unquotedExpression, unquotedVariable, parameters)
+        result = UserInput().evaluateCard(
+            card_name, unquotedExpression, unquotedVariable, parameters)
     except ValueError as e:
         return HttpResponse(json.dumps({
-            'error': e.message
+            'error': e
         }), content_type="application/json")
     except:
         trace = traceback.format_exc(5)
@@ -132,14 +141,16 @@ def returnResultAsCard(request, card_name):
 
     return HttpResponse(json.dumps(result), content_type="application/json")
 
+
 def viewCardInformation(request, card_name):
-    unquotedVariable, unquotedExpression, _ = processVariablesAndExpressions(request, card_name)
+    unquotedVariable, unquotedExpression, _ = processVariablesAndExpressions(
+        request, card_name)
 
     try:
         result = UserInput().getCardInfo(card_name, unquotedVariable, unquotedExpression)
     except ValueError as e:
         return HttpResponse(json.dumps({
-            'error': e.message
+            'error': e
         }), content_type="application/json")
     except:
         trace = traceback.format_exc(5)
@@ -150,40 +161,45 @@ def viewCardInformation(request, card_name):
 # https://github.com/crucialfelix/django-ajax-selects/pull/82/files
     return HttpResponse(json.dumps(result), content_type="application/json")
 
+
 def viewAllCards(request, card_name):
-    unquotedVariable, unquotedExpression, parameters = processVariablesAndExpressions(request, card_name)
+    unquotedVariable, unquotedExpression, parameters = processVariablesAndExpressions(
+        request, card_name)
 
     try:
-        card_info = UserInput().getCardInfo(card_name, unquotedVariable, unquotedExpression)
-        result = UserInput().evaluateCard(card_name, unquotedVariable, unquotedExpression, parameters)
+        card_info = UserInput().getCardInfo(
+            card_name, unquotedVariable, unquotedExpression)
+        result = UserInput().evaluateCard(
+            card_name, unquotedVariable, unquotedExpression, parameters)
         card_info['card'] = card_name
         card_info['cell_output'] = result['output']
 
         html = render_to_string('card.html', {
             'cell': card_info,
-            'input': expression
+            'input': unquotedExpression
         })
     except ValueError as e:
-        card_info = UserInput().getCardInfo(card_name, unquotedVariable, unquotedExpression)
+        card_info = UserInput().getCardInfo(
+            card_name, unquotedVariable, unquotedExpression)
         return HttpResponse(render_to_string('card.html', {
             'cell': {
                 'title': card_info['title'],
                 'input': card_info['input'],
                 'card': card_name,
-                'variable': variable,
-                'error': e.message
+                'variable': unquotedVariable,
+                'error': e
             },
-            'input': expression
+            'input': unquotedExpression
         }), content_type="text/html")
     except:
         trace = traceback.format_exc(5)
         return HttpResponse(render_to_string('card.html', {
             'cell': {
                 'card': card_name,
-                'variable': variable,
+                'variable': unquotedVariable,
                 'error': trace
             },
-            'input': expression
+            'input': unquotedExpression
         }), content_type="text/html")
 
     response = HttpResponse(html, content_type="text/html")
@@ -194,10 +210,11 @@ def viewAllCards(request, card_name):
 
 
 def ReferenceGuide(request):
-    return render(request,"ReferenceGuide.html", {
+    return render(request, "ReferenceGuide.html", {
         "MEDIA_URL": settings.STATIC_URL,
         "table_active": "selected",
-        })
+    })
+
 
 class ChatBotAppView(TemplateView):
     template_name = 'app.html'
@@ -216,11 +233,10 @@ class ChatBotApiView(View):
         * The JSON data should contain a 'text' attribute.
         """
 
-
-        input_data = json.loads(request.body.decode('utf-8'))  
+        input_data = json.loads(request.body.decode('utf-8'))
         msg = input_data['text']
-        
-        response = chatbot_response(msg)
+
+        response = chatbotResponse(msg)
 
         return JsonResponse({
             'text': [
@@ -228,8 +244,10 @@ class ChatBotApiView(View):
             ]
         }, status=200)
 
+
 def handler404(request, exception):
-    return render(request,"404.html")
+    return render(request, "404.html")
+
 
 def handler500(request):
-    return render(request,"500.html")
+    return render(request, "500.html")

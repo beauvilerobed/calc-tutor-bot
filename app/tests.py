@@ -45,14 +45,7 @@ class ApiTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn('text', response.json())
 
-
-class ApiTestCase(TestCase):
-
-    def setUp(self):
-        super().setUp()
-        self.api_url = reverse('chatbot')
-
-    def test_post(self):
+    def test_other_post(self):
         """
         Test that a response is returned.
         """
@@ -139,8 +132,9 @@ class ApiTestCase(TestCase):
 
         self.assertEqual(response.status_code, 405)
 
+
 class TestEval(TestCase):
-    def test_eval1(object):
+    def test_eval1(self, object):
         e = Eval()
         assert e.eval("1+1") == "2"
         assert e.eval("1+1\n") == "2"
@@ -151,14 +145,16 @@ class TestEval(TestCase):
         assert e.eval("a=1+1\na=3") == ""
         assert e.eval("a=1+1\na=3\n") == ""
 
-    def test_eval2(object):
+    def test_eval2(self, object):
         e = Eval()
         assert e.eval("\ndef f(x):\n\treturn x**2\nf(3)") == "9"
         assert e.eval("\ndef f(x):\n\treturn x**2\nf(3)\na = 5") == ""
-        assert e.eval("\ndef f(x):\n\treturn x**2\nif f(3) == 9:\n\ta = 1\nelse:\n\ta = 0\na") == "1"
-        assert e.eval("\ndef f(x):\n\treturn x**2 + 1\nif f(3) == 9:\n\ta = 1\nelse:\n\ta = 0\na") == "0"
+        assert e.eval(
+            "\ndef f(x):\n\treturn x**2\nif f(3) == 9:\n\ta = 1\nelse:\n\ta = 0\na") == "1"
+        assert e.eval(
+            "\ndef f(x):\n\treturn x**2 + 1\nif f(3) == 9:\n\ta = 1\nelse:\n\ta = 0\na") == "0"
 
-    def test_eval3(object):
+    def test_eval3(self, object):
         e = Eval()
         assert e.eval("xxxx").startswith("Traceback")
         assert e.eval("""\
@@ -169,5 +165,5 @@ class TestEval(TestCase):
     else:
         a = 0
     a
-    """\
-            ).startswith("Traceback")
+    """
+                      ).startswith("Traceback")

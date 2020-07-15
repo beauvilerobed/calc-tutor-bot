@@ -18,6 +18,7 @@ import sympy
 from sympy.solvers.diophantine import diophantine
 """
 
+
 def makeLatexReadable(*args):
     TeXcode = []
     for obj in args:
@@ -33,7 +34,7 @@ def makeLatexReadable(*args):
             not obj.free_symbols and not obj.is_Integer and
             not obj.is_Float and
             obj.is_finite is not False and
-            hasattr(obj, 'evalf')):
+                hasattr(obj, 'evalf')):
             tag = '<script type="math/tex; mode=display" data-numeric="true" ' \
                   'data-output-repr="{}" data-approximation="{}">'.format(
                       repr(obj), latex(obj.evalf(15)))
@@ -41,6 +42,7 @@ def makeLatexReadable(*args):
     TeXcode = ''.join(TeXcode)
 
     return ''.join([tag, TeXcode, '</script>'])
+
 
 class UserInput(object):
 
@@ -63,7 +65,8 @@ class UserInput(object):
             cards = []
 
             try:
-                cards.extend(self.prepareCards(parsed, arguments, evaluator, evaluated))
+                cards.extend(self.prepareCards(
+                    parsed, arguments, evaluator, evaluated))
             except ValueError as e:
                 return self.handleInputError(s, e)
 
@@ -96,10 +99,9 @@ class UserInput(object):
                 {"title": "Error", "input": s, "error": trace}
             ]
 
-
     def evaluateUserInput(self, s):
         namespace = {}
-        exec(PREEXEC , namespace)
+        exec(PREEXEC, namespace)
 
         evaluator = Eval(namespace)
         # change to True to spare the user from exceptions:
@@ -117,8 +119,6 @@ class UserInput(object):
             raise
         except Exception as e:
             raise ValueError(str(e))
-        input_repr = repr(evaluated)
-        namespace['input_evaluated'] = evaluated
 
         return parsed, arguments(parsed, evaluator), evaluator, evaluated
 
@@ -152,7 +152,8 @@ class UserInput(object):
         return components, cards, evaluated, (is_function and is_applied)
 
     def prepareCards(self, parsed, arguments, evaluator, evaluated):
-        components, cards, evaluated, is_function = self.getCardsAndComponents(arguments, evaluator, evaluated)
+        components, cards, evaluated, is_function = self.getCardsAndComponents(
+            arguments, evaluator, evaluated)
 
         if is_function:
             latex_input = ''.join(['<script type="math/tex; mode=display">',
@@ -202,7 +203,7 @@ class UserInput(object):
                             card.pre_output_function(evaluated, var)),
                         'parameters': card.card_info.get('parameters', [])
                     })
-                except (SyntaxError, ValueError) as e:
+                except:
                     pass
         return result
 
@@ -214,7 +215,8 @@ class UserInput(object):
 
         _, arguments, evaluator, evaluated = self.evaluateUserInput(expression)
         variable = sympy.Symbol(variable)
-        components, cards, evaluated, _ = self.getCardsAndComponents(arguments, evaluator, evaluated)
+        components, _, evaluated, _ = self.getCardsAndComponents(
+            arguments, evaluator, evaluated)
         components['variable'] = variable
 
         return {
@@ -232,7 +234,8 @@ class UserInput(object):
 
         _, arguments, evaluator, evaluated = self.evaluateUserInput(expression)
         variable = sympy.Symbol(variable)
-        components, cards, evaluated, _ = self.getCardsAndComponents(arguments, evaluator, evaluated)
+        components, _, evaluated, _ = self.getCardsAndComponents(
+            arguments, evaluator, evaluated)
         components['variable'] = variable
         evaluator.set(str(variable), variable)
         result = card.eval(evaluator, components, parameters)

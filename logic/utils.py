@@ -1,4 +1,8 @@
 from __future__ import division
+from sympy.parsing.sympy_parser import (
+    AppliedFunction, split_symbols,
+    function_exponentiation, implicit_application, OP, NAME,
+    _group_parentheses, _apply_functions, _flatten, _token_callable)
 import difflib
 import collections
 import traceback
@@ -7,9 +11,9 @@ import ast
 import re
 # from StringIO import StringIO
 try:
-    from StringIO import StringIO ## for Python 2
+    from StringIO import StringIO  # for Python 2
 except ImportError:
-    from io import StringIO ## for Python 3
+    from io import StringIO  # for Python 3
 import sympy
 
 from sympy.core.relational import Relational
@@ -19,6 +23,7 @@ from token import NAME
 OTHER_SYMPY_FUNCTIONS = ('sqrt',)
 
 Arguments = collections.namedtuple('Arguments', 'function args kwargs')
+
 
 class Eval(object):
     def __init__(self, namespace={}):
@@ -80,6 +85,7 @@ class Eval(object):
             s = "".join(traceback.format_exception(etype, value, tb))
             return s
 
+
 class LatexVisitor(ast.NodeVisitor):
     EXCEPTIONS = {'integrate': sympy.Integral, 'diff': sympy.Derivative}
     formatters = {}
@@ -120,7 +126,8 @@ class LatexVisitor(ast.NodeVisitor):
                     if isinstance(arg, ast.Call) and getattr(arg.func, 'id', None) and arg.func.id[0].lower() == arg.func.id[0]:
                         latexes.append(self.visit_Call(arg))
                     else:
-                        latexes.append(sympy.latex(self.evaluator.eval_node(arg)))
+                        latexes.append(sympy.latex(
+                            self.evaluator.eval_node(arg)))
 
                 buffer.append(', '.join(latexes))
                 buffer.append(')')
@@ -130,17 +137,21 @@ class LatexVisitor(ast.NodeVisitor):
                 self.latex = sympy.latex(self.evaluator.eval_node(node))
         return self.latex
 
+
 @LatexVisitor.formats_function('rsolve')
 def format_rsolve(node, visitor):
-    recurrence = sympy.latex(sympy.Eq(visitor.evaluator.eval_node(node.args[0]), 0))
+    recurrence = sympy.latex(
+        sympy.Eq(visitor.evaluator.eval_node(node.args[0]), 0))
     if len(node.args) == 3:
         conds = visitor.evaluator.eval_node(node.args[2])
-        initconds = '\\\\\n'.join('&' + sympy.latex(sympy.Eq(eqn, val)) for eqn, val in conds.items())
+        initconds = '\\\\\n'.join(
+            '&' + sympy.latex(sympy.Eq(eqn, val)) for eqn, val in conds.items())
         text = r'&\mathrm{Solve~the~recurrence~}' + recurrence + r'\\'
         condstext = r'&\mathrm{with~initial~conditions}\\'
         return r'\begin{align}' + text + condstext + initconds + r'\end{align}'
     else:
         return r'\mathrm{Solve~the~recurrence~}' + recurrence
+
 
 @LatexVisitor.formats_function('summation')
 @LatexVisitor.formats_function('product')
@@ -151,12 +162,14 @@ def format_diophantine(node, visitor):
         klass = sympy.Product
     return sympy.latex(klass(*map(visitor.evaluator.eval_node, node.args)))
 
+
 @LatexVisitor.formats_function('help')
 def format_help(node, visitor):
     if node.args:
         function = visitor.evaluator.eval_node(node.args[0])
         return r'\mathrm{Show~documentation~for~}' + function.__name__
     return r'\mathrm{Show~documentation~(requires~1~argument)}'
+
 
 class TopCallVisitor(ast.NodeVisitor):
     def __init__(self):
@@ -171,18 +184,23 @@ class TopCallVisitor(ast.NodeVisitor):
             self.call = node
 
 # From https://stackoverflow.com/a/739301/262727
+
+
 def ordinal(n):
     if 10 <= n % 100 < 20:
         return 'th'
     else:
-       return {1 : 'st', 2 : 'nd', 3 : 'rd'}.get(n % 10, "th")
+        return {1: 'st', 2: 'nd', 3: 'rd'}.get(n % 10, "th")
 
 # TODO: modularize all of this
+
+
 def latexify(string, evaluator):
     a = LatexVisitor()
     a.evaluator = evaluator
     a.visit(ast.parse(string))
     return a.latex
+
 
 def topcall(string):
     a = TopCallVisitor()
@@ -190,6 +208,7 @@ def topcall(string):
     if hasattr(a, 'call'):
         return getattr(a.call.func, 'id', None)
     return None
+
 
 def arguments(string_or_node, evaluator):
     node = None
@@ -211,17 +230,22 @@ def arguments(string_or_node, evaluator):
 
             kwargs = node.keywords
             if kwargs:
-                kwargs = {kwarg.arg: evaluator.eval_node(kwarg.value) for kwarg in kwargs}
+                kwargs = {kwarg.arg: evaluator.eval_node(
+                    kwarg.value) for kwarg in kwargs}
 
             return Arguments(name, args, kwargs)
         elif isinstance(node, ast.Name):
             return Arguments(node.id, [], {})
     return None
 
-re_calls = re.compile(r'(Integer|Symbol|Float|Rational)\s*\([\'\"]?([a-zA-Z0-9\.]+)[\'\"]?\s*\)')
+
+re_calls = re.compile(
+    r'(Integer|Symbol|Float|Rational)\s*\([\'\"]?([a-zA-Z0-9\.]+)[\'\"]?\s*\)')
+
 
 def re_calls_sub(match):
     return match.groups()[1]
+
 
 def removeSymPy(string):
     try:
@@ -229,10 +253,6 @@ def removeSymPy(string):
     except IndexError:
         return string
 
-from sympy.parsing.sympy_parser import (
-    AppliedFunction, implicit_multiplication, split_symbols,
-    function_exponentiation, implicit_application, OP, NAME,
-    _group_parentheses, _apply_functions, _flatten, _token_callable)
 
 def _implicit_multiplication(tokens, local_dict, global_dict):
     result = []
@@ -240,13 +260,13 @@ def _implicit_multiplication(tokens, local_dict, global_dict):
     for tok, nextTok in zip(tokens, tokens[1:]):
         result.append(tok)
         if (isinstance(tok, AppliedFunction) and
-              isinstance(nextTok, AppliedFunction)):
+                isinstance(nextTok, AppliedFunction)):
             result.append((OP, '*'))
         elif (isinstance(tok, AppliedFunction) and
               nextTok[0] == OP and nextTok[1] == '('):
             # Applied function followed by an open parenthesis
             if (tok.function[1] == 'Symbol' and
-                len(tok.args[1][1]) == 3):
+                    len(tok.args[1][1]) == 3):
                 # Allow implicit function symbol creation
                 # TODO XXX need some way to offer alternative parsing here -
                 # sometimes we want this and sometimes not, hard to tell when
@@ -288,6 +308,7 @@ def _implicit_multiplication(tokens, local_dict, global_dict):
         result.append(tokens[-1])
     return result
 
+
 def implicit_multiplication(result, local_dict, global_dict):
     """Makes the multiplication operator optional in most cases.
 
@@ -309,6 +330,7 @@ def implicit_multiplication(result, local_dict, global_dict):
 
     result = _flatten(result)
     return result
+
 
 def custom_implicit_transformation(result, local_dict, global_dict):
     """Allows a slightly relaxed syntax.
@@ -346,6 +368,7 @@ SYNONYMS = {
     u'antiderivative': 'integrate',
 }
 
+
 def synonyms(tokens, local_dict, global_dict):
     """Make some names synonyms for others.
 
@@ -362,32 +385,3 @@ def synonyms(tokens, local_dict, global_dict):
                 continue
         result.append(token)
     return result
-
-# def close_matches(s, global_dict):
-#     """
-#     Checks undefined names to see if they are close matches to a defined name.
-#     """
-
-#     tokens = sympy_tokenize.generate_tokens(StringIO(s.strip()).readline)
-#     result = []
-#     has_result = False
-#     all_names = set(global_dict).union(SYNONYMS)
-
-#     # strip the token location info to avoid strange untokenize results
-#     tokens = [(tok[0], tok[1]) for tok in tokens]
-#     for token in tokens:
-#         if (token[0] == NAME and
-#             token[1] not in all_names and
-#             len(token[1]) > 1):
-#             matches = difflib.get_close_matches(token[1], all_names)
-
-#             if matches and matches[0] == token[1]:
-#                 matches = matches[1:]
-#             if matches:
-#                 result.append((NAME, matches[0]))
-#                 has_result = True
-#                 continue
-#         result.append(token)
-#     if has_result:
-#         return sympy_tokenize.untokenize(result).strip()
-#     return None
