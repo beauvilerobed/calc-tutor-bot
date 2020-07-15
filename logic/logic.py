@@ -19,13 +19,13 @@ from sympy.solvers.diophantine import diophantine
 """
 
 
-def makeLatexReadable(*args):
-    TeXcode = []
+def make_latex_readable(*args):
+    latex_code = []
     for obj in args:
         if hasattr(obj, 'as_latex'):
-            TeXcode.append(obj.as_latex())
+            latex_code.append(obj.as_latex())
         else:
-            TeXcode.append(latex(obj))
+            latex_code.append(latex(obj))
 
     tag = '<script type="math/tex; mode=display">'
     if len(args) == 1:
@@ -39,25 +39,25 @@ def makeLatexReadable(*args):
                   'data-output-repr="{}" data-approximation="{}">'.format(
                       repr(obj), latex(obj.evalf(15)))
 
-    TeXcode = ''.join(TeXcode)
+    latex_code = ''.join(latex_code)
 
-    return ''.join([tag, TeXcode, '</script>'])
+    return ''.join([tag, latex_code, '</script>'])
 
 
 class UserInput(object):
 
-    def changeToCards(self, s):
+    def change_to_cards(self, s):
         result = None
 
         try:
-            result = self.evaluateUserInput(s)
+            result = self.evaluate_user_input(s)
         except TokenError:
             return [
                 {"title": "Input", "input": s},
                 {"title": "Error", "input": s, "error": "Invalid input"}
             ]
         except Exception as e:
-            return self.handleInputError(s, e)
+            return self.handle_input_error(s, e)
 
         if result:
             parsed, arguments, evaluator, evaluated = result
@@ -65,14 +65,14 @@ class UserInput(object):
             cards = []
 
             try:
-                cards.extend(self.prepareCards(
+                cards.extend(self.prepare_cards(
                     parsed, arguments, evaluator, evaluated))
             except ValueError as e:
-                return self.handleInputError(s, e)
+                return self.handle_input_error(s, e)
 
             return cards
 
-    def handleInputError(self, s, e):
+    def handle_input_error(self, s, e):
         if isinstance(e, SyntaxError):
             error = {
                 "msg": e.msg,
@@ -99,7 +99,7 @@ class UserInput(object):
                 {"title": "Error", "input": s, "error": trace}
             ]
 
-    def evaluateUserInput(self, s):
+    def evaluate_user_input(self, s):
         namespace = {}
         exec(PREEXEC, namespace)
 
@@ -122,7 +122,7 @@ class UserInput(object):
 
         return parsed, arguments(parsed, evaluator), evaluator, evaluated
 
-    def getCardsAndComponents(self, arguments, evaluator, evaluated):
+    def get_cards_and_components(self, arguments, evaluator, evaluated):
         first_func_name = arguments[0]
         # is the top-level function call to a function such as factorint or
         # simplify?
@@ -151,8 +151,8 @@ class UserInput(object):
 
         return components, cards, evaluated, (is_function and is_applied)
 
-    def prepareCards(self, parsed, arguments, evaluator, evaluated):
-        components, cards, evaluated, is_function = self.getCardsAndComponents(
+    def prepare_cards(self, parsed, arguments, evaluator, evaluated):
+        components, cards, evaluated, is_function = self.get_cards_and_components(
             arguments, evaluator, evaluated)
 
         if is_function:
@@ -160,7 +160,7 @@ class UserInput(object):
                                    latexify(parsed, evaluator),
                                    '</script>'])
         else:
-            latex_input = makeLatexReadable(evaluated)
+            latex_input = make_latex_readable(evaluated)
 
         result = []
 
@@ -176,7 +176,7 @@ class UserInput(object):
             result.append({
                 'title': 'Result',
                 'input': removeSymPy(parsed),
-                'output': format_by_type(evaluated, arguments, makeLatexReadable)
+                'output': format_by_type(evaluated, arguments, make_latex_readable)
             })
         else:
             var = components['variable']
@@ -185,7 +185,7 @@ class UserInput(object):
             if is_function and not is_function_handled(arguments[0]):
                 result.append(
                     {"title": "Result", "input": "",
-                     "output": format_by_type(evaluated, arguments, makeLatexReadable)})
+                     "output": format_by_type(evaluated, arguments, make_latex_readable)})
 
             for card_name in cards:
                 card = get_card(card_name)
@@ -207,15 +207,15 @@ class UserInput(object):
                     pass
         return result
 
-    def getCardInfo(self, card_name, expression, variable):
+    def get_card_info(self, card_name, expression, variable):
         card = get_card(card_name)
 
         if not card:
             raise KeyError
 
-        _, arguments, evaluator, evaluated = self.evaluateUserInput(expression)
+        _, arguments, evaluator, evaluated = self.evaluate_user_input(expression)
         variable = sympy.Symbol(variable)
-        components, _, evaluated, _ = self.getCardsAndComponents(
+        components, _, evaluated, _ = self.get_cards_and_components(
             arguments, evaluator, evaluated)
         components['variable'] = variable
 
@@ -226,15 +226,15 @@ class UserInput(object):
             'pre_output': latex(card.pre_output_function(evaluated, variable))
         }
 
-    def evaluateCard(self, card_name, expression, variable, parameters):
+    def evaluate_card(self, card_name, expression, variable, parameters):
         card = get_card(card_name)
 
         if not card:
             raise KeyError
 
-        _, arguments, evaluator, evaluated = self.evaluateUserInput(expression)
+        _, arguments, evaluator, evaluated = self.evaluate_user_input(expression)
         variable = sympy.Symbol(variable)
-        components, _, evaluated, _ = self.getCardsAndComponents(
+        components, _, evaluated, _ = self.get_cards_and_components(
             arguments, evaluator, evaluated)
         components['variable'] = variable
         evaluator.set(str(variable), variable)
@@ -242,5 +242,5 @@ class UserInput(object):
 
         return {
             'value': repr(result),
-            'output': card.format_output(result, makeLatexReadable)
+            'output': card.format_output(result, make_latex_readable)
         }

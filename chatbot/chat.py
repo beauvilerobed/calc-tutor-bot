@@ -24,7 +24,7 @@ def clean_up_sentence(sentence):
 # return bag of words array: 0 or 1 for each word in the bag that exists in the sentence
 
 
-def returnBagOfWords(sentence, words, show_details=True):
+def return_bag_of_words(sentence, words, show_details=True):
     sentence_words = clean_up_sentence(sentence)
     bag = [0]*len(words)
     for s in sentence_words:
@@ -36,10 +36,10 @@ def returnBagOfWords(sentence, words, show_details=True):
     return(np.array(bag))
 
 
-def predictionFilter(sentence, model):
+def prediction_filter(sentence, model):
 
-    bagOfWords = returnBagOfWords(sentence, words, show_details=False)
-    res = model.predict(np.array([bagOfWords]))[0]
+    bag_of_words = return_bag_of_words(sentence, words, show_details=False)
+    res = model.predict(np.array([bag_of_words]))[0]
     ERROR_THRESHOLD = 0.25
     results = [[i, r] for i, r in enumerate(res) if r > ERROR_THRESHOLD]
 
@@ -51,7 +51,7 @@ def predictionFilter(sentence, model):
     return return_list
 
 
-def getResponse(ints, intents_json):
+def get_response(ints, intents_json):
     tag = ints[0]['intent']
     list_of_intents = intents_json['intents']
     for i in list_of_intents:
@@ -61,12 +61,12 @@ def getResponse(ints, intents_json):
     return result
 
 
-def chatbotResponse(sentence):
-    ints = predictionFilter(sentence, model)
-    res = getResponse(ints, intents)
+def chatbot_response(sentence):
+    ints = prediction_filter(sentence, model)
+    res = get_response(ints, intents)
     return res
 
 
 # initiate chatbot
 sentence = "Hello World!"
-chatbotResponse(sentence)
+chatbot_response(sentence)

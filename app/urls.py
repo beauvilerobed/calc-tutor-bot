@@ -11,13 +11,13 @@ urlpatterns = [
     path('', views.index),
 
     path('input/', views.input),
-    path('ReferenceGuide/', views.ReferenceGuide),
+    path('ReferenceGuide/', views.reference_guide),
 
-    path('card/<card_name>', views.returnResultAsCard),
+    path('card/<card_name>', views.return_result_as_card),
 
-    path('card_info/<card_name>', views.viewCardInformation),
+    path('card_info/<card_name>', views.view_card_information),
 
-    path('card_full/<card_name>', views.viewAllCards)
+    path('card_full/<card_name>', views.view_all_cards)
 
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs'
