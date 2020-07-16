@@ -87,10 +87,10 @@ def input(request):
         if form.is_valid():
             input = form.cleaned_data["i"]
 
-            EVALUATED = UserInput().change_to_cards(input)
+            evaluated = UserInput().change_to_cards(input)
 
-            if not EVALUATED:
-                EVALUATED = [{
+            if not evaluated:
+                evaluated = [{
                     "title": "Input",
                     "input": input,
                     "output": "Can't handle the input."
@@ -98,7 +98,7 @@ def input(request):
 
             return render(request, "result.html", {
                 "input": input,
-                "result": EVALUATED,
+                "result": evaluated,
                 "form": form,
                 "MEDIA_URL": settings.STATIC_URL,
             })
@@ -126,7 +126,7 @@ def return_result_as_card(request, card_name):
         request, card_name)
 
     try:
-        result = UserInput().evaluateCard(
+        result = UserInput().evaluate_card(
             card_name, unquoted_expression, unquoted_variable, parameters)
     except ValueError as e:
         return HttpResponse(json.dumps({
@@ -147,7 +147,7 @@ def view_card_information(request, card_name):
         request, card_name)
 
     try:
-        result = UserInput().getCardInfo(card_name, unquoted_variable, unquoted_expression)
+        result = UserInput().get_card_info(card_name, unquoted_variable, unquoted_expression)
     except ValueError as e:
         return HttpResponse(json.dumps({
             'error': e
@@ -167,9 +167,9 @@ def view_all_cards(request, card_name):
         request, card_name)
 
     try:
-        card_info = UserInput().getCardInfo(
+        card_info = UserInput().get_card_info(
             card_name, unquoted_variable, unquoted_expression)
-        result = UserInput().evaluateCard(
+        result = UserInput().evaluate_card(
             card_name, unquoted_variable, unquoted_expression, parameters)
         card_info['card'] = card_name
         card_info['cell_output'] = result['output']
@@ -179,7 +179,7 @@ def view_all_cards(request, card_name):
             'input': unquoted_expression
         })
     except ValueError as e:
-        card_info = UserInput().getCardInfo(
+        card_info = UserInput().get_card_info(
             card_name, unquoted_variable, unquoted_expression)
         return HttpResponse(render_to_string('card.html', {
             'cell': {
