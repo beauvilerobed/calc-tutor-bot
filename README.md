@@ -1,6 +1,8 @@
 # Calc-tutor
 Artificial math tutor that helps you find derivatives and indefinite integrals through a step-by-step process with optional conversation (if you are not sure about any of the steps)
 
+<img src="static/images/demo.gif" width="75%" height="100%">
+
 ## Getting Started
 
 Setup project environment with [virtualenv](https://virtualenv.pypa.io) and [pip](https://pip.pypa.io).
