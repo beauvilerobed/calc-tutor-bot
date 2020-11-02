@@ -1,5 +1,5 @@
-# Calc-tutor
-Artificial math tutor that helps you find derivatives and indefinite integrals through a step-by-step process with optional conversation (if you are not sure about any of the steps)
+# Calc-Tutor
+"Calculus Tutor" that helps you find derivatives and indefinite integrals through a step-by-step process with and A.I. powered chat bot that gives you information about key concepts in calculus.
 
 <img src="static/images/demo.gif" width="75%" height="100%">
 
