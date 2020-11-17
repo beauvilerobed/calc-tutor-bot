@@ -1,7 +1,7 @@
-# Calc-Tutor
+# Calculus-Calculator-with-Chatbot
 "Calculus Tutor" that helps you find derivatives and indefinite integrals through a step-by-step process with an A.I. powered chat bot which provides you with information about key concepts in calculus.
 
-<img src="static/images/ezgif.com-gif-maker (2).gif" width="75%" height="100%">
+<img src="demo_for_calc.gif" width="100%" height="100%">
 
 ## Getting Started
 
