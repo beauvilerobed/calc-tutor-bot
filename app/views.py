@@ -17,13 +17,11 @@ from mathtutor import settings
 import os
 import json
 import urllib
-# https://docs.python.org/3/library/urllib.parse.html#module-urllib.parse
 import urllib.parse
 import datetime
 import traceback
 
 from django.views.decorators.csrf import csrf_exempt
-# https://devcenter.heroku.com/articles/getting-started-with-python#push-local-changes
 import requests
 
 EXAMPLES_FOR_HOME_PAGE = [
@@ -66,8 +64,6 @@ class TextInputWidget(forms.widgets.TextInput):
 class SearchForm(forms.Form):
     i = forms.CharField(required=False, widget=TextInputWidget())
 
-# render home page
-
 
 def index(request):
     form = SearchForm()
@@ -78,7 +74,6 @@ def index(request):
         "examples": EXAMPLES_FOR_HOME_PAGE
     })
 
-# return user input
 
 
 def input(request):
@@ -158,7 +153,6 @@ def view_card_information(request, card_name):
             'error': ('There was an error. For reference'
                       'the last five traceback entries are: ' + trace)
         }), content_type="application/json")
-# https://github.com/crucialfelix/django-ajax-selects/pull/82/files
     return HttpResponse(json.dumps(result), content_type="application/json")
 
 

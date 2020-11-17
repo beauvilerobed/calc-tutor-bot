@@ -56,7 +56,7 @@ var
   core_toString = class2type.toString,
   core_hasOwn = class2type.hasOwnProperty,
   core_trim = core_version.trim,
-
+  
   // Define a local copy of jQuery
   jQuery = function( selector, context ) {
     // The jQuery object is actually just the init constructor 'enhanced'

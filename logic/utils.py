@@ -376,7 +376,6 @@ def synonyms(tokens, local_dict, global_dict):
     Gamma displays shows the correct function name. Must be applied before
     auto_symbol.
     """
-
     result = []
     for token in tokens:
         if token[0] == NAME:

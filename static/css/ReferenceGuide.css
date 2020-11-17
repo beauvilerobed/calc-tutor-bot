@@ -1,8 +1,6 @@
 * {
     box-sizing: border-box;
   } 
-  /* https://stackoverflow.com/questions/8839374/html-and-css-background-image-is-not-showing-up */
-  /* https://www.w3schools.com/html/tryit.asp?filename=tryhtml_images_background4 */
 
 body {
     font-family: 'Open Sans', sans-serif;
@@ -15,43 +13,40 @@ body {
     background-size: cover;
   }
 
-  /* https://www.w3schools.com/howto/howto_js_filter_lists.asp */
 /* filter/Search List */
 #searchForTable {
-  background-image: url('/css/searchicon.png'); /* Add a search icon to input */
-  background-position: 10px 12px; /* Position the search icon */
-  background-repeat: no-repeat; /* Do not repeat the icon image */
-  width: 100%; /* Full-width */
-  font-size: 16px; /* Increase font-size */
-  padding: 12px 20px 12px 40px; /* Add some padding */
-  border: 1px solid #ddd; /* Add a grey border */
-  margin-bottom: 12px; /* Add some space below the input */
+  background-image: url('/css/searchicon.png'); 
+  background-position: 10px 12px;
+  background-repeat: no-repeat; 
+  width: 100%; 
+  font-size: 16px;
+  padding: 12px 20px 12px 40px;
+  border: 1px solid #ddd; 
+  margin-bottom: 12px; 
 }
 
 #myUL {
-  /* Remove default list styling */
   list-style-type: none;
   padding: 0;
   margin: 0;
 }
 
 #myUL li a {
-  border: 1px solid #ddd; /* Add a border to all links */
-  margin-top: -1px; /* Prevent double borders */
-  background-color: #f6f6f6; /* Grey background color */
-  padding: 12px; /* Add some padding */
-  text-decoration: none; /* Remove default text underline */
-  font-size: 18px; /* Increase the font-size */
-  color: black; /* Add a black text color */
-  display: block; /* Make it into a block element to fill the whole list */
+  border: 1px solid #ddd; 
+  margin-top: -1px; 
+  background-color: #f6f6f6;
+  padding: 12px; 
+  text-decoration: none; 
+  font-size: 18px; 
+  color: black; 
+  display: block;
 }
 
 #myUL li a:hover:not(.header) {
-  background-color: #eee; /* Add a hover effect to all links, except for headers */
+  background-color: #eee; 
 }
-/* filter/Search List */
+/* end filter/Search List */
 
-/* https://css-tricks.com/adding-stroke-to-web-text/ */
 h1 {
   font-family: 'Gentium Basic', serif;
   font-weight: bold;
@@ -60,7 +55,6 @@ h1 {
   margin: 0;
   line-height: 70px;
   text-align: center;
-  /* -webkit-text-stroke: 1px black; */
   color: grey;
   text-shadow:
       3px 3px 0 #000,
@@ -90,7 +84,6 @@ h1.image_input{
 #mydivheader{
   display: none;
 }
-/* https://www.tutorialspoint.com/How-to-remove-underline-from-a-link-in-HTML */
 h1 a:link, h1 a:visited, h1 a:active {
   color: grey;
   text-decoration: none;
@@ -100,27 +93,27 @@ h1 a:hover {
   color: rgb(255, 255, 255);
 }
 
-/* --------------------------- */
+
 /* The Modal (background) */
 .modal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  padding-top: 100px; /* Location of the box */
+  display: none; 
+  position: fixed;
+  z-index: 1; 
+  padding-top: 100px; 
   left: 0;
   top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0,0.1); /* Black w/ opacity */
-  -webkit-animation-name: fadeIn; /* Fade in the background */
+  width: 100%; 
+  height: 100%; 
+  overflow: auto; 
+  background-color: rgb(0,0,0); 
+  background-color: rgba(0,0,0,0.1); 
+  -webkit-animation-name: fadeIn;
   -webkit-animation-duration: 0.4s;
   animation-name: fadeIn;
   animation-duration: 0.4s;
 }
 
-/* The Close Button */
+
 .close {
   font-size: 175%;
   font-weight: bold;
@@ -131,7 +124,7 @@ h1 a:hover {
   text-decoration: none;
   cursor: pointer;
 }
-/* Add Animation */
+
 @-webkit-keyframes slideIn {
   from {bottom: -300px; opacity: 0} 
   to {bottom: 0; opacity: 1}
@@ -151,11 +144,7 @@ h1 a:hover {
   from {opacity: 0} 
   to {opacity: 1}
 }
-/* --------------------------- */
 
-
-/* ---------------------------- */
-/* Alternate the background color of the output rows */
 .modal-content {
   margin: 10px;
   padding: 10px;
@@ -186,7 +175,6 @@ h1 a:hover {
 .chat-log {
   overflow-y:scroll;
 }
-/* ---------------------------- */
 
  /* for chat bot modal */
  .form-control{
@@ -201,4 +189,4 @@ h1 a:hover {
    color: white;
 }
 
- /* for chat bot modal */
+ /* end for chat bot modal */

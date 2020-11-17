@@ -13,7 +13,6 @@ from sympy.strategies.core import switch, identity
 def Rule(name, props=""):
     return collections.namedtuple(name, props + " context symbol")
 
-
 ConstantRule = Rule("ConstantRule", "number")
 ConstantTimesRule = Rule("ConstantTimesRule", "constant other substep")
 PowerRule = Rule("PowerRule", "base exp")

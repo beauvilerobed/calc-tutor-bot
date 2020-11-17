@@ -48,7 +48,6 @@ class ExampleLinkNode(template.Node):
             title, example = None, example
 
         buf = []
-
         if title:
             buf.append('<span>{}</span>'.format(title))
 

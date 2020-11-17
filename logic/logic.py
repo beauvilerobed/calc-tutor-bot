@@ -18,7 +18,6 @@ import sympy
 from sympy.solvers.diophantine import diophantine
 """
 
-
 def make_latex_readable(*args):
     latex_code = []
     for obj in args:

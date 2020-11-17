@@ -15,7 +15,6 @@ from sympy.integrals.manualintegrate import (
 # TODO: add manualintegrate flag to integrate
 _evaluating = None
 
-
 @evaluates(DontKnowRule)
 def eval_dontknow(context, symbol):
     global _evaluating

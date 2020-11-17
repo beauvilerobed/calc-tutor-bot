@@ -4,6 +4,7 @@ from contextlib import contextmanager
 
 from sympy import latex
 
+
 def Rule(name, props=""):
     # namedtuple class name not considered!
     def __eq__(self, other):

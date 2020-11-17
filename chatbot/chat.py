@@ -7,6 +7,7 @@ import nltk
 from nltk.stem import WordNetLemmatizer
 lemmatizer = WordNetLemmatizer()
 
+
 model = load_model('chatbot_model.h5')
 intents = json.loads(open('intents.json').read())
 words = pickle.load(open('words.pkl', 'rb'))
@@ -22,8 +23,6 @@ def clean_up_sentence(sentence):
     return sentence_words
 
 # return bag of words array: 0 or 1 for each word in the bag that exists in the sentence
-
-
 def return_bag_of_words(sentence, words, show_details=True):
     sentence_words = clean_up_sentence(sentence)
     bag = [0]*len(words)
