@@ -60,7 +60,6 @@ class TextInputWidget(forms.widgets.TextInput):
         attrs['autocapitalize'] = 'off'
         return super(TextInputWidget, self).render(name, value, attrs)
 
-
 class SearchForm(forms.Form):
     i = forms.CharField(required=False, widget=TextInputWidget())
 
@@ -217,7 +216,7 @@ class ChatBotAppView(TemplateView):
 class ChatBotApiView(View):
 
     """
-    Provide an API endpoint to interact with ChatterBot.
+    Provide an API endpoint to interact with ChatBot.
     """
 
     def post(self, request, *args, **kwargs):

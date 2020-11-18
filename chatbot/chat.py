@@ -34,7 +34,6 @@ def return_bag_of_words(sentence, words, show_details=True):
                     print("found in bag: %s" % w)
     return(np.array(bag))
 
-
 def prediction_filter(sentence, model):
 
     bag_of_words = return_bag_of_words(sentence, words, show_details=False)
@@ -66,6 +65,8 @@ def chatbot_response(sentence):
     return res
 
 
-# initiate chatbot
-sentence = "Hello World!"
-chatbot_response(sentence)
+def start_chatbot(sentence):
+    chatbot_response(sentence)
+
+
+start_chatbot("hello, world")

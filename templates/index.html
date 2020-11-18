@@ -52,7 +52,6 @@ Math Tutor
           'text': $input.val()
         }
 
-        // Display the user's input on the web page
         createRow(inputData.text);
 
         var $submit = $.ajax({
@@ -64,16 +63,12 @@ Math Tutor
 
         $submit.done(function(statement) {
             createRow(statement.text);
-
-            // Clear the input field
             $input.val('');
-
-            // Scroll to the bottom of the chat interface
             $chatlog[0].scrollTop = $chatlog[0].scrollHeight;
         });
 
-        $submit.fail(function() {
-          // TODO: Handle errors
+        $submit.fail(function(err) {
+            console.error(err)
         });
       }
 
@@ -82,7 +77,6 @@ Math Tutor
       });
 
       $input.keydown(function(event) {
-        // Submit the input when the enter button is pressed
         if (event.keyCode == 13) {
           submitInput();
         }
