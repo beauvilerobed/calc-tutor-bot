@@ -3,11 +3,14 @@ import traceback
 import collections
 from logic.utils import Eval, latexify, arguments, removeSymPy, \
     custom_implicit_transformation, synonyms, OTHER_SYMPY_FUNCTIONS
+
 from logic.resultsets import find_result_set, get_card, format_by_type, \
     is_function_handled
 from sympy import latex, series, sympify, solve, Derivative, \
     Integral, Symbol, diff, integrate
+    
 import sympy
+
 from sympy.core.function import FunctionClass
 from sympy.parsing.sympy_parser import stringify_expr, eval_expr, \
     standard_transformations, convert_xor, TokenError

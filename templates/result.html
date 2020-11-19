@@ -52,7 +52,6 @@
               'text': $input.val()
             }
     
-            // Display the user's input on the web page
             createRow(inputData.text);
     
             var $submit = $.ajax({
@@ -64,16 +63,12 @@
     
             $submit.done(function(statement) {
                 createRow(statement.text);
-    
-                // Clear the input field
                 $input.val('');
-    
-                // Scroll to the bottom of the chat interface
                 $chatlog[0].scrollTop = $chatlog[0].scrollHeight;
             });
     
-            $submit.fail(function() {
-              // TODO: Handle errors
+            $submit.fail(function(err) {
+                console.error(err)
             });
           }
     
@@ -82,7 +77,6 @@
           });
     
           $input.keydown(function(event) {
-            // Submit the input when the enter button is pressed
             if (event.keyCode == 13) {
               submitInput();
             }
@@ -92,9 +86,6 @@
       </div>
     
     </div>
-
-
-
           <div class="search1">
             <form action="/input/" class="search-form" method="GET">
               {{ form.i }}
@@ -103,9 +94,7 @@
           </div>
         <div id="loading"></div>
         <div class="page">
-        <!-- uncomment to see all result as a list -->
             {% for cell in result %}
-                <!-- <li>{{ cell }}</li><br> -->
                 {% show_card cell input %}
             {% endfor %}    
         </div>

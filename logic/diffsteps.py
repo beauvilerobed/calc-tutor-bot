@@ -87,7 +87,6 @@ def constant_rule(derivative):
 def mul_rule(derivative):
     expr, symbol = derivative
     terms = expr.args
-    is_div = 1 / sympy.Wild("denominator")
 
     coeff, f = expr.as_independent(symbol)
 
@@ -411,7 +410,6 @@ class DiffPrinter(object):
     def print_Div(self, rule):
         with self.new_step():
             f, g = rule.numerator, rule.denominator
-            fp, gp = f.diff(rule.symbol), g.diff(rule.symbol)
             x = rule.symbol
             ff = sympy.Function("f")(x)
             gg = sympy.Function("g")(x)
