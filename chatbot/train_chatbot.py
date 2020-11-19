@@ -9,6 +9,7 @@ import nltk
 from nltk.stem import WordNetLemmatizer
 lemmatizer = WordNetLemmatizer()
 
+
 words = []
 classes = []
 documents = []
@@ -16,7 +17,7 @@ ignore_words = ['?', '!']
 data_file = open('./chatbot/intents.json').read()
 intents = json.loads(data_file)
 
-
+ 
 for intent in intents['intents']:
     for pattern in intent['patterns']:
 

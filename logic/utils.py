@@ -9,15 +9,10 @@ import traceback
 import sys
 import ast
 import re
-# from StringIO import StringIO
-try:
-    from StringIO import StringIO  # for Python 2
-except ImportError:
-    from io import StringIO  # for Python 3
+from io import StringIO
 import sympy
 
 from sympy.core.relational import Relational
-# import sympy.parsing.sympy_tokenize as sympy_tokenize
 from token import NAME
 
 OTHER_SYMPY_FUNCTIONS = ('sqrt',)

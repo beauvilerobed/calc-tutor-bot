@@ -13,7 +13,7 @@ body {
     background-size: cover;
   }
 
-/* filter/Search List */
+
 #searchForTable {
   background-image: url('/css/searchicon.png'); 
   background-position: 10px 12px;
@@ -45,7 +45,7 @@ body {
 #myUL li a:hover:not(.header) {
   background-color: #eee; 
 }
-/* end filter/Search List */
+
 
 h1 {
   font-family: 'Gentium Basic', serif;
@@ -93,8 +93,6 @@ h1 a:hover {
   color: rgb(255, 255, 255);
 }
 
-
-/* The Modal (background) */
 .modal {
   display: none; 
   position: fixed;
@@ -176,7 +174,7 @@ h1 a:hover {
   overflow-y:scroll;
 }
 
- /* for chat bot modal */
+
  .form-control{
   width: 100%;
   border: 2px solid grey;
@@ -188,5 +186,3 @@ h1 a:hover {
 {
    color: white;
 }
-
- /* end for chat bot modal */
