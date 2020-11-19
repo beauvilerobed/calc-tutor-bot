@@ -106,7 +106,7 @@ class UserInput(object):
         exec(PREEXEC, namespace)
 
         evaluator = Eval(namespace)
-        # change to True to spare the user from exceptions:
+
         if not len(s):
             return None
 

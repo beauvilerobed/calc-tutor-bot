@@ -146,7 +146,7 @@ def trig_rule(derivative):
             RewriteRule(f_r_2, diff_steps(f_r_2, symbol), expr, symbol)
         ], expr, symbol)
     else:
-        return DontKnowRule(f, symbol)
+        return DontKnowRule(expr, symbol)
 
 
 def exp_rule(derivative):
@@ -300,7 +300,7 @@ def diff(rule):
         raise ValueError("Cannot evaluate derivative")
 
 
-class DiffPrinter(object):
+class DiffPrinter(stepprinter.HTMLPrinter):
     def __init__(self, rule):
         self.print_rule(rule)
         self.rule = rule
@@ -371,8 +371,7 @@ class DiffPrinter(object):
 
     def print_Mul(self, rule):
         with self.new_step():
-            self.append("Apply the product rule:".format(
-                self.format_math(rule.context)))
+            self.append("Apply the product rule:")
 
             fnames = list(map(lambda n: sympy.Function(n)(rule.symbol),
                               functionnames(len(rule.terms))))
@@ -434,7 +433,7 @@ class DiffPrinter(object):
             self.append(self.format_math(diff(rule)) + '</ol></div>')
 
     def print_Chain(self, rule):
-        with self.new_step(), self.new_u_vars() as (u, du):
+        with self.new_step(), self.new_u_vars() as (u, _):
             self.append("Let {}.".format(
                 self.format_math(sympy.Eq(u, rule.inner))))
             self.print_rule(replace_u_var(rule.substep, rule.u_var, u))

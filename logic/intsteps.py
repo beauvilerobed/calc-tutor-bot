@@ -50,7 +50,7 @@ def filter_unknown_alternatives(rule):
     return rule
 
 
-class IntegralPrinter(object):
+class IntegralPrinter(stepprinter.HTMLPrinter):
     def __init__(self, rule):
         self.rule = rule
         self.print_rule(rule)
@@ -198,7 +198,7 @@ class IntegralPrinter(object):
             self.append("Use integration by parts, noting that the integrand"
                         " eventually repeats itself.")
 
-            u, v, du, dv = map(lambda f: sympy.Function(f)(rule.symbol), 'u v du dv'.split())
+            u, _, _, dv = map(lambda f: sympy.Function(f)(rule.symbol), 'u v du dv'.split())
             current_integrand = rule.context
             total_result = sympy.S.Zero
             with self.new_level():
