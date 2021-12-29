@@ -39,7 +39,7 @@ sqlparse==0.4.2
 sympy==0.7.5
 tensorboard==2.4.0
 tensorboard-plugin-wit==1.7.0
-tensorflow==2.5.1
+tensorflow==2.5.2
 tensorflow-estimator==2.3.0
 termcolor==1.1.0
 tqdm==4.52.0
