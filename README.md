@@ -6,7 +6,6 @@
 Setup project environment with [virtualenv](https://virtualenv.pypa.io) and [pip](https://pip.pypa.io).
 
 ```bash
-$ cd calculus-calculator-with-chatbot
 $ virtualenv env
 $ source env/bin/activate
 $ pip install -r requirements.txt
