@@ -5,7 +5,7 @@ cachetools==4.2.4
 certifi==2021.10.8
 chardet==4.0.0
 click==8.0.3
-Django==3.2.11
+django>=3.2.12
 docutils==0.18.1
 gast==0.4.0
 google-auth==2.3.3
