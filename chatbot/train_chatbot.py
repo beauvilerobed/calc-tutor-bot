@@ -8,10 +8,10 @@ import json
 import nltk
 
 from nltk.stem import WordNetLemmatizer
+
+nltk.download('all', download_dir='./nltk_data/')
+
 lemmatizer = WordNetLemmatizer()
-
-nltk.download('tokenizers', download_dir='./calc-tutor-bot/nltk_data/')
-
 
 words = []
 classes = []
