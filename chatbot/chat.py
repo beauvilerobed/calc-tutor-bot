@@ -4,7 +4,11 @@ from keras.models import load_model
 import numpy as np
 import pickle
 import nltk
+
 from nltk.stem import WordNetLemmatizer
+
+nltk.download('tokenizers', download_dir='./calc-tutor-bot/nltk_data/')
+
 lemmatizer = WordNetLemmatizer()
 
 

@@ -6,8 +6,11 @@ import numpy as np
 import pickle
 import json
 import nltk
+
 from nltk.stem import WordNetLemmatizer
 lemmatizer = WordNetLemmatizer()
+
+nltk.download('tokenizers', download_dir='./calc-tutor-bot/nltk_data/')
 
 
 words = []
