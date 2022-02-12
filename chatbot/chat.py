@@ -7,6 +7,7 @@ import nltk
 
 from nltk.stem import WordNetLemmatizer
 
+nltk.download('omw-1.4', download_dir='./nltk_data')
 lemmatizer = WordNetLemmatizer()
 
 

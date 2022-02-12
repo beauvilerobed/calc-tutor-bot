@@ -9,8 +9,6 @@ import nltk
 
 from nltk.stem import WordNetLemmatizer
 
-nltk.download('all', download_dir='./nltk_data/')
-
 lemmatizer = WordNetLemmatizer()
 
 words = []
