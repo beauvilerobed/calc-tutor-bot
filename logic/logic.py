@@ -1,13 +1,10 @@
-import sys
 import traceback
-import collections
 from logic.utils import Eval, latexify, arguments, removeSymPy, \
     custom_implicit_transformation, synonyms, OTHER_SYMPY_FUNCTIONS
 
 from logic.resultsets import find_result_set, get_card, format_by_type, \
     is_function_handled
-from sympy import latex, series, sympify, solve, Derivative, \
-    Integral, Symbol, diff, integrate
+from sympy import latex
     
 import sympy
 

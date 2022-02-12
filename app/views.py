@@ -1,28 +1,22 @@
 from django.http import HttpResponse, JsonResponse, Http404
-from django.shortcuts import render_to_response, redirect, render
+from django.shortcuts import render
 from django.template.loader import render_to_string
 from django import forms
 from django.views.generic.base import TemplateView
 from django.views.generic import View
-import django
+
 
 from chatbot.chat import chatbot_response
 
-from logic.utils import Eval
-from logic.logic import UserInput, make_latex_readable
-from logic.resultsets import get_card, find_result_set
+from logic.logic import UserInput
 
 from mathtutor import settings
 
-import os
 import json
 import urllib
 import urllib.parse
-import datetime
 import traceback
 
-from django.views.decorators.csrf import csrf_exempt
-import requests
 
 EXAMPLES_FOR_HOME_PAGE = [
     ('Calculus', [

@@ -3,7 +3,6 @@ from sympy.parsing.sympy_parser import (
     AppliedFunction, split_symbols,
     function_exponentiation, implicit_application, OP, NAME,
     _group_parentheses, _apply_functions, _flatten, _token_callable)
-import difflib
 import collections
 import traceback
 import sys
@@ -12,7 +11,6 @@ import re
 from io import StringIO
 import sympy
 
-from sympy.core.relational import Relational
 from token import NAME
 
 OTHER_SYMPY_FUNCTIONS = ('sqrt',)

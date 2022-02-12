@@ -7,7 +7,7 @@ from logic.stepprinter import functionnames, replace_u_var
 
 from sympy.core.function import AppliedUndef
 from sympy.functions.elementary.trigonometric import TrigonometricFunction
-from sympy.strategies.core import switch, identity
+from sympy.strategies.core import switch
 
 
 def Rule(name, props=""):
