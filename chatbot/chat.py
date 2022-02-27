@@ -10,10 +10,10 @@ from nltk.stem.wordnet import WordNetLemmatizer
 lemmatizer = WordNetLemmatizer()
 nltk.data.path.append('./nltk_data/')
 
-model = load_model('chatbot_model.h5')
-intents = json.loads(open('intents.json').read())
-words = pickle.load(open('words.pkl', 'rb'))
-classes = pickle.load(open('classes.pkl', 'rb'))
+model = load_model('./chatbot/chatbot_model.h5')
+intents = json.loads(open('./chatbot/intents.json').read())
+words = pickle.load(open('./chatbot/words.pkl', 'rb'))
+classes = pickle.load(open('./chatbot/classes.pkl', 'rb'))
 
 def clean_up_sentence(sentence):
     sentence_words = word_tokenize(sentence)
@@ -65,5 +65,5 @@ def chatbot_response(sentence):
 def start_chatbot(sentence):
     chatbot_response(sentence)
 
-
-start_chatbot("hello, world")
+if __name__ == "__main__":
+    start_chatbot("begin")
