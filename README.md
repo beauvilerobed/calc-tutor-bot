@@ -9,5 +9,9 @@ Setup project environment with [virtualenv](https://virtualenv.pypa.io) and [pip
 virtualenv env
 source env/bin/activate
 pip install -r requirements.txt
+
+# download nltk data for WordNetLemmatizer and word_tokenize
+python chatbot/nltk_packages.py 
+
 python manage.py runserver
 ```

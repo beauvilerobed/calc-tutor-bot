@@ -8,7 +8,7 @@ from nltk.tokenize import word_tokenize
 from nltk.stem.wordnet import WordNetLemmatizer
 
 lemmatizer = WordNetLemmatizer()
-nltk.data.path.append('./chatbot/nltk_data/')
+nltk.data.path.append('./nltk_data/')
 
 model = load_model('chatbot_model.h5')
 intents = json.loads(open('intents.json').read())
