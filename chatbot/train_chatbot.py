@@ -34,8 +34,8 @@ words = [lemmatizer.lemmatize(word.lower())
 words = sorted(list(set(words)))
 classes = sorted(list(set(classes)))
 
-pickle.dump(words, open('words.pkl', 'wb'))
-pickle.dump(classes, open('classes.pkl', 'wb'))
+pickle.dump(words, open('./chatbot/words.pkl', 'wb'))
+pickle.dump(classes, open('./chatbot/classes.pkl', 'wb'))
 
 # begin training
 training = []
