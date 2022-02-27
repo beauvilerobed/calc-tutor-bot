@@ -4,29 +4,24 @@ from keras.models import load_model
 import numpy as np
 import pickle
 import nltk
+from nltk.tokenize import word_tokenize
+from nltk.stem.wordnet import WordNetLemmatizer
 
-from nltk.stem import WordNetLemmatizer
-
-nltk.download('omw-1.4', download_dir='./nltk_data')
 lemmatizer = WordNetLemmatizer()
-
+nltk.data.path.append('./chatbot/nltk_data/')
 
 model = load_model('chatbot_model.h5')
 intents = json.loads(open('intents.json').read())
 words = pickle.load(open('words.pkl', 'rb'))
 classes = pickle.load(open('classes.pkl', 'rb'))
 
-nltk.data.path.append('./nltk_data/')
-
-
 def clean_up_sentence(sentence):
-    sentence_words = nltk.word_tokenize(sentence)
+    sentence_words = word_tokenize(sentence)
     sentence_words = [lemmatizer.lemmatize(
         word.lower()) for word in sentence_words]
     return sentence_words
 
-# return bag of words array: 0 or 1 for each word in the bag that exists in the sentence
-def return_bag_of_words(sentence, words, show_details=True):
+def return_bag_of_words(sentence, words, show_details=False):
     sentence_words = clean_up_sentence(sentence)
     bag = [0]*len(words)
     for s in sentence_words:
@@ -44,7 +39,6 @@ def prediction_filter(sentence, model):
     ERROR_THRESHOLD = 0.25
     results = [[i, r] for i, r in enumerate(res) if r > ERROR_THRESHOLD]
 
-    # sort by strength of probability
     results.sort(key=lambda x: x[1], reverse=True)
     return_list = []
     for r in results:
