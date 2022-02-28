@@ -1,3 +1,4 @@
+import pathlib
 import random
 import json
 from keras.models import load_model
@@ -7,13 +8,15 @@ import nltk
 from nltk.tokenize import word_tokenize
 from nltk.stem.wordnet import WordNetLemmatizer
 
-lemmatizer = WordNetLemmatizer()
 nltk.data.path.append('./nltk_data/')
 
-model = load_model('./chatbot/chatbot_model.h5')
-intents = json.loads(open('./chatbot/intents.json').read())
-words = pickle.load(open('./chatbot/words.pkl', 'rb'))
-classes = pickle.load(open('./chatbot/classes.pkl', 'rb'))
+DIR_NAME = str(pathlib.Path().resolve())+'/'
+
+model = load_model(DIR_NAME+'chatbot_model/chatbot_model.h5')
+intents = json.loads(open(DIR_NAME+'/data/intents.json').read())
+words = pickle.load(open(DIR_NAME+'/words.pkl', 'rb'))
+classes = pickle.load(open(DIR_NAME+'/classes.pkl', 'rb'))
+lemmatizer = WordNetLemmatizer()
 
 def clean_up_sentence(sentence):
     sentence_words = word_tokenize(sentence)
