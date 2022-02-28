@@ -1,4 +1,4 @@
-# Calculus-Calculator-with-Chatbot
+# Calculus-Tutor-Bot
 
 https://user-images.githubusercontent.com/59368349/155909917-13051557-c50a-49ad-8d43-a182ffb71961.mov
 
