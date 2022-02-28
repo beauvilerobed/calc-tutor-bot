@@ -1,5 +1,7 @@
 # Calculus-Calculator-with-Chatbot
-<img src="demo.gif" width="100%" height="100%">
+
+https://user-images.githubusercontent.com/59368349/155909917-13051557-c50a-49ad-8d43-a182ffb71961.mov
+
 
 ## Getting Started
 
