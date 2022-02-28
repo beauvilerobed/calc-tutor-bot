@@ -1,5 +1,7 @@
 import nltk
 
+nltk.data.path.append('./nltk_data/')
+
 def download_nltk_packages():
     nltk.download('punkt', './nltk_data/')
     nltk.download('wordnet', './nltk_data/')
