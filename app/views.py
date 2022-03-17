@@ -28,7 +28,6 @@ EXAMPLES_FOR_HOME_PAGE = [
             ('See the steps for derivatives of this function',
              'diff(x^4 / (1 + (tan(sin(x))))^2)'),
             ('Learn multiple ways to derive functions', 'diff(cot(y), y)'),
-            ('Learn to differentiate implicitly', 'diff(z*x^4 - tan(z), z)'),
 
         ]],
         ['Antiderivatives', [
