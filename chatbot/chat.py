@@ -10,12 +10,12 @@ from nltk.stem.wordnet import WordNetLemmatizer
 
 nltk.data.path.append('./nltk_data/')
 
-DIR_NAME = str(pathlib.Path().resolve())+'/'
+DIR_NAME = str(pathlib.Path().resolve())
 
-model = load_model(DIR_NAME+'chatbot_model/chatbot_model.h5')
-intents = json.loads(open(DIR_NAME+'data/intents.json').read())
-words = pickle.load(open(DIR_NAME+'words.pkl', 'rb'))
-classes = pickle.load(open(DIR_NAME+'classes.pkl', 'rb'))
+model = load_model(DIR_NAME+'/chatbot/chatbot_model/chatbot_model.h5')
+intents = json.loads(open(DIR_NAME+'/chatbot/data/intents.json').read())
+words = pickle.load(open(DIR_NAME+'/chatbot/words.pkl', 'rb'))
+classes = pickle.load(open(DIR_NAME+'/chatbot/classes.pkl', 'rb'))
 lemmatizer = WordNetLemmatizer()
 
 def clean_up_sentence(sentence):
