@@ -12,16 +12,20 @@ pip
 virtualenv
 ```
 #### First, setup environment with [virtualenv](https://virtualenv.pypa.io) then run:
-Download nltk data for WordNetLemmatizer and word_tokenize
-```
-python chatbot/nltk_packages.py 
-```
-
-Then run
+Run
 
 ```bash
 virtualenv env
 source env/bin/activate
 pip install -r requirements.txt
-python manage.py runserver
+```
+
+The download nltk data for WordNetLemmatizer and word_tokenize
+```
+python3 chatbot/nltk_packages.py 
+```
+
+Then Run
+```
+python3 manage.py runserver
 ```
