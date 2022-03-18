@@ -18,7 +18,7 @@ import urllib.parse
 import traceback
 
 
-EXAMPLES_FOR_HOME_PAGE = [
+HOME_PAGE_EXAMPLES = [
     ('Calculus', [
         ['Derivatives', [
             ('Learn how to derive the product rule for multiple functions',
@@ -63,7 +63,7 @@ def index(request):
     return render(request, "index.html", {
         "form": form,
         "MEDIA_URL": settings.STATIC_URL,
-        "examples": EXAMPLES_FOR_HOME_PAGE
+        "examples": HOME_PAGE_EXAMPLES
     })
 
 

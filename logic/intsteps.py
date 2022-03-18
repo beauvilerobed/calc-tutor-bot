@@ -1,7 +1,6 @@
 import sympy
-from contextlib import contextmanager
 from logic import stepprinter
-from logic.stepprinter import functionnames, Rule, replace_u_var
+from logic.stepprinter import replace_u_var
 
 from sympy.integrals.manualintegrate import ( _manualintegrate, integral_steps, evaluates,
     ConstantRule, ConstantTimesRule, PowerRule, AddRule, URule,
