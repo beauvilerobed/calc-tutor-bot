@@ -92,13 +92,13 @@ def input(request):
 
 
 def process_variables_and_expressions(request, card_name):
-    variables_from_input = request.GET.get('variable')
+    variable_from_input = request.GET.get('variable')
     expression_from_input = request.GET.get('expression')
 
-    if not variables_from_input or not expression_from_input:
+    if not variable_from_input or not expression_from_input:
         raise Http404
 
-    unquoted_variable = urllib.parse.unquote(variables_from_input)
+    unquoted_variable = urllib.parse.unquote(variable_from_input)
     unquoted_expression = urllib.parse.unquote(expression_from_input)
 
     parameters = {}
@@ -196,7 +196,7 @@ def view_all_cards(request, card_name):
 
 
 def reference_guide(request):
-    return render(request, "ReferenceGuide.html", {
+    return render(request, "reference.html", {
         "MEDIA_URL": settings.STATIC_URL,
         "table_active": "selected",
     })
@@ -207,21 +207,9 @@ class ChatBotAppView(TemplateView):
 
 
 class ChatBotApiView(View):
-
-    """
-    Provide an API endpoint to interact with ChatBot.
-    """
-
     def post(self, request, *args, **kwargs):
-        """
-        Return a response to the statement in the posted data.
-
-        * The JSON data should contain a 'text' attribute.
-        """
-
         input_data = json.loads(request.body.decode('utf-8'))
         msg = input_data['text']
-
         response = chatbot_response(msg)
 
         return JsonResponse({
