@@ -7,7 +7,7 @@ urlpatterns = [
     path('', views.index),
 
     path('input/', views.input),
-    path('ReferenceGuide/', views.reference_guide),
+    path('reference/', views.reference_guide),
 
     path('card/<card_name>', views.return_result_as_card),
 
