@@ -9,21 +9,6 @@ register = template.Library()
 def show_card(cell, input):
     return {'cell': cell, 'input': input}
 
-
-class QueryNode(template.Node):
-    def __init__(self, query):
-        if query[0] == query[-1] and query[0] in ('"', "'"):
-            self.query = query
-        else:
-            self.query = template.Variable(query)
-
-    def render(self, context):
-        if isinstance(self.query):
-            return "/input/?i=" + urllib.parse.quote(self.query[1:-1])
-        else:
-            return "/input/?i=" + urllib.parse.quote(self.query.resolve(context))
-
-
 @register.tag(name='make_example')
 def do_make_example(parser, token):
     try:
@@ -33,7 +18,6 @@ def do_make_example(parser, token):
             "%r tag requires a single argument" % token.contents.split()[0])
 
     return ExampleLinkNode(example)
-
 
 class ExampleLinkNode(template.Node):
     def __init__(self, example):
