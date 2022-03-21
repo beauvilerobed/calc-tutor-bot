@@ -1,6 +1,5 @@
 import traceback
-from logic.utils import Eval, latexify, arguments, removeSymPy, \
-    custom_implicit_transformation, synonyms, OTHER_SYMPY_FUNCTIONS
+from logic.utils import Eval, latexify, arguments, removeSymPy, OTHER_SYMPY_FUNCTIONS
 
 from logic.resultsets import find_result_set, get_card, format_by_type, \
     is_function_handled
@@ -9,14 +8,12 @@ from sympy import latex
 import sympy
 
 from sympy.core.function import FunctionClass
-from sympy.parsing.sympy_parser import stringify_expr, eval_expr, \
-    standard_transformations, convert_xor, TokenError
+from sympy.parsing.sympy_parser import stringify_expr, parse_expr, \
+    standard_transformations, convert_xor, TokenError,\
+    implicit_multiplication, split_symbols, implicit_multiplication_application,\
+    function_exponentiation, implicit_application
 
-PREEXEC = """from __future__ import division
-from sympy import *
-import sympy
-from sympy.solvers.diophantine import diophantine
-"""
+PREEXEC = """from sympy import *"""
 
 def make_latex_readable(*args):
     latex_code = []
@@ -60,7 +57,6 @@ class UserInput(object):
 
         if result:
             parsed, arguments, evaluator, evaluated = result
-
             cards = []
 
             try:
@@ -101,19 +97,17 @@ class UserInput(object):
     def evaluate_user_input(self, s):
         namespace = {}
         exec(PREEXEC, namespace)
-
         evaluator = Eval(namespace)
 
         if not len(s):
             return None
 
-        transformations = []
-        transformations.append(synonyms)
-        transformations.extend(standard_transformations)
-        transformations.extend((convert_xor, custom_implicit_transformation))
+        transformations = (standard_transformations +
+            (implicit_multiplication, convert_xor, function_exponentiation,
+            split_symbols,implicit_application,implicit_multiplication_application,))
         parsed = stringify_expr(s, {}, namespace, transformations)
         try:
-            evaluated = eval_expr(parsed, {}, namespace)
+            evaluated = parse_expr(parsed, evaluate=True)
         except SyntaxError:
             raise
         except Exception as e:
@@ -205,25 +199,6 @@ class UserInput(object):
                 except:
                     pass
         return result
-
-    def get_card_info(self, card_name, expression, variable):
-        card = get_card(card_name)
-
-        if not card:
-            raise KeyError
-
-        _, arguments, evaluator, evaluated = self.evaluate_user_input(expression)
-        variable = sympy.Symbol(variable)
-        components, _, evaluated, _ = self.get_cards_and_components(
-            arguments, evaluator, evaluated)
-        components['variable'] = variable
-
-        return {
-            'var': repr(variable),
-            'title': card.format_title(evaluated),
-            'input': card.format_input(repr(evaluated), components),
-            'pre_output': latex(card.pre_output_function(evaluated, variable))
-        }
 
     def evaluate_card(self, card_name, expression, variable, parameters):
         card = get_card(card_name)
