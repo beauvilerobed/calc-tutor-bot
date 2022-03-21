@@ -579,12 +579,6 @@ ol.content {
     width: 100%;
     margin: 10px auto;
   }
-
-  #mobile-keyboard button {
-    width: 2em;
-    font-size: 1.25em;
-    margin: 0;
-  }
 }
 
 @media screen and (min-device-width: 500px) {
@@ -603,11 +597,6 @@ ol.content {
   }
   .col.example div.example-group li {
     margin: 0.25em 0;
-  }
-
-  #mobile-keyboard button {
-    width: 3em;
-    font-size: 1.5em;
   }
 }
 

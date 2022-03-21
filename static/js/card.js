@@ -33,7 +33,7 @@ var Card = (function() {
             var url = '/card/' + this.card_name;
             var parms = {
                 variable: this.variable,
-                expression: this.expr
+                expression: this.expr,
             };
             $.extend(parms, this.parameterValues);
             var deferred = $.getJSON(url, parms, finished);
@@ -45,8 +45,6 @@ var Card = (function() {
         return result;
     };
 
-    // call with no arguments for pre-evaluated cards
-    // (e.g. from Card.loadFullCard)
     Card.prototype.evaluateFinished = function(data) {
         if (data) {
             if (typeof data.output !== "undefined") {
@@ -263,16 +261,6 @@ var Card = (function() {
             loader.slideUp(200);
         });
         return card;
-    };
-
-    Card.loadFullCard = function(card_name, variable, expr, parameterValues) {
-        var url = '/card_full/' + card_name;
-        var parms = {
-            variable: variable,
-            expression: expr
-        };
-        $.extend(parms, parameterValues);
-        return $.get(url, parms);
     };
 
     return Card;
