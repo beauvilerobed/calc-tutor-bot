@@ -2,7 +2,6 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
-from app.templatetags import extra_tags
 
 
 def main():
