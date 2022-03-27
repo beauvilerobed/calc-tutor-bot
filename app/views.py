@@ -21,6 +21,7 @@ HOME_PAGE_EXAMPLES = [
             ('Learn multiple ways to derive functions', 'diff(cot(y), y)'),
             ('And if we don\'t know, we will let you know',
              'diff(x^x, x)'),
+            ('Learn how to us the product rule on multiple functions', 'diff(x*cos(x)*sin(x)*tan(x), x)'),
 
         ]],
         ['Antiderivatives', [
