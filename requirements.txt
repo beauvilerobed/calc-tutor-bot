@@ -28,7 +28,7 @@ ipython==7.32.0
 jedi==0.18.1
 joblib==1.1.0
 jupyter-client==7.1.2
-jupyter-core==4.9.2
+jupyter-core==4.11.2
 keras==2.8.0
 Keras-Preprocessing==1.1.2
 libclang==13.0.0
