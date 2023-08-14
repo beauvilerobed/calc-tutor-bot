@@ -71,7 +71,7 @@ tensorflow-estimator==2.7.0
 tensorflow-io-gcs-filesystem==0.24.0
 termcolor==1.1.0
 tf-estimator-nightly==2.8.0.dev2021122109
-tornado==6.3.2
+tornado==6.3.3
 tqdm==4.62.3
 traitlets==5.1.1
 typing_extensions==4.0.1
