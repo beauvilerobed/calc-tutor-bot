@@ -308,6 +308,89 @@ body {
     overflow-x: auto;
 }
 
+/* Display math (div) is clickable to open in an expanded modal — helps with
+   equations too wide to read without horizontal scrolling. Inline math (span)
+   is intentionally NOT clickable. */
+div.step__math {
+    cursor: zoom-in;
+}
+
+div.step__math:hover {
+    background: #eef2f8;
+    border-left-color: var(--color-primary-dark);
+}
+
+/* Math expand modal */
+.math-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+}
+
+.math-modal.open {
+    display: block;
+}
+
+.math-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.75);
+}
+
+.math-modal__content {
+    position: relative;
+    margin: 5vh auto;
+    max-width: 95vw;
+    max-height: 90vh;
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem 2rem 2rem;
+    box-shadow: var(--shadow-lg);
+    overflow: auto;
+}
+
+.math-modal__close {
+    position: absolute;
+    top: 0.375rem;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    font-size: 1.75rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--color-text);
+    padding: 0.25rem 0.625rem;
+    border-radius: var(--radius-sm);
+}
+
+.math-modal__close:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+.math-modal__body {
+    font-size: 1.5rem;
+    text-align: center;
+    overflow-x: auto;
+    padding: 0.5rem 0.25rem;
+}
+
+body.math-modal-open {
+    overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    .math-modal__content {
+        margin: 2vh auto;
+        max-width: 96vw;
+        max-height: 96vh;
+        padding: 2.25rem 0.875rem 1rem;
+    }
+    .math-modal__body {
+        font-size: 1.25rem;
+    }
+}
+
 /* Step Content wrapper */
 .step__content {
     transition: all var(--transition);
@@ -318,14 +401,15 @@ body {
     line-height: 1.6;
 }
 
-/* Collapsible Step Behavior - hide math and nested steps when collapsed.
+/* Collapsible Step Behavior - hide all step content when collapsed.
    Use height/overflow collapse (not display:none) so MathJax can still
    measure container widths and apply automatic linebreaks to long
    equations. Otherwise the math is typeset at width 0 and overflows
    when revealed. */
 .step.collapsible:not(.open) > div.step__math,
 .step.collapsible:not(.open) > .step__content,
-.step.collapsible:not(.open) > .steps--nested {
+.step.collapsible:not(.open) > .steps--nested,
+.step.collapsible:not(.open) > .step__text {
     height: 0 !important;
     margin-top: 0 !important;
     margin-bottom: 0 !important;
@@ -338,6 +422,27 @@ body {
     pointer-events: none;
 }
 
+/* Collapsed step: keep enough height for the step number badge and arrow,
+   and re-center them vertically (the default top:1rem aligns the badge with
+   the first line of content, which looks bottom-heavy when content is gone). */
+.step.collapsible:not(.open) {
+    min-height: 4rem;
+}
+
+.step.collapsible:not(.open)::before {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.step.collapsible:not(.open):hover::before {
+    transform: translateY(-50%) scale(1.1);
+}
+
+.step.collapsible:not(.open)::after {
+    top: 50%;
+    margin-top: -3px;
+}
+
 /* Inline math spans inside the always-visible summary text:
    safe to fully hide since inline math wraps naturally. */
 .step.collapsible:not(.open) span.step__math {
@@ -346,7 +451,8 @@ body {
 
 .step.collapsible.open .step__math,
 .step.collapsible.open > .step__content,
-.step.collapsible.open > .steps--nested {
+.step.collapsible.open > .steps--nested,
+.step.collapsible.open > .step__text {
     display: block;
     visibility: visible;
     height: auto;
