@@ -140,7 +140,8 @@ body {
 }
 
 .search-form input[type="text"]::placeholder {
-    color: var(--color-text-light);
+    color: #cbd5e1;
+    opacity: 1;
 }
 
 .search-form button,
@@ -316,17 +317,28 @@ body {
     line-height: 1.6;
 }
 
-/* Collapsible Step Behavior - hide math and nested steps when collapsed */
-.step.collapsible:not(.open) .step__math,
+/* Collapsible Step Behavior - hide math and nested steps when collapsed.
+   Use height/overflow collapse (not display:none) so MathJax can still
+   measure container widths and apply automatic linebreaks to long
+   equations. Otherwise the math is typeset at width 0 and overflows
+   when revealed. */
+.step.collapsible:not(.open) > div.step__math,
 .step.collapsible:not(.open) > .step__content,
 .step.collapsible:not(.open) > .steps--nested {
-    display: none !important;
-    visibility: hidden !important;
     height: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    border-top-width: 0 !important;
+    border-bottom-width: 0 !important;
+    opacity: 0;
     overflow: hidden !important;
+    pointer-events: none;
 }
 
-/* Ensure inline math spans are also hidden */
+/* Inline math spans inside the always-visible summary text:
+   safe to fully hide since inline math wraps naturally. */
 .step.collapsible:not(.open) span.step__math {
     display: none !important;
 }
@@ -1129,6 +1141,28 @@ script[type="math/tex"] {
     display: none;
 }
 
+/* Keep MathJax display math inside its container on phone + desktop.
+   MathJax linebreak handles wrapping; this scroll fallback covers
+   browsers/cases where a single token can't be broken. */
+mjx-container[display="true"] {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+}
+
+.step__math,
+.card__output {
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+}
+
+.card__output {
+    overflow-x: auto;
+}
+
 /* ==========================================
    NEW HOMEPAGE STYLES
    ========================================== */
@@ -1279,17 +1313,17 @@ script[type="math/tex"] {
 }
 
 .feature p {
-    color: var(--color-text-light);
+    color: #cbd5e1;
     font-size: 0.95rem;
     line-height: 1.6;
 }
 
 .feature code {
-    background: var(--color-bg-light);
+    background: #334155;
     padding: 0.2rem 0.4rem;
     border-radius: var(--radius-sm);
     font-size: 0.85rem;
-    color: var(--color-primary);
+    color: #fda58c;
 }
 
 /* More Examples with Tabs */

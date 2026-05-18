@@ -79,7 +79,12 @@ class TextInputWidget(forms.widgets.TextInput):
         return super(TextInputWidget, self).render(name, value, attrs)
 
 class SearchForm(forms.Form):
-    i = forms.CharField(required=False, widget=TextInputWidget())
+    i = forms.CharField(
+        required=False,
+        widget=TextInputWidget(attrs={
+            'placeholder': "Try a derivative, integral, or limit."
+        }),
+    )
 
 def index(request):
     form = SearchForm()

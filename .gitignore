@@ -137,6 +137,9 @@ venv.bak/
 .dmypy.json
 dmypy.json
 
+# Local reference notes (not for the repo)
+CHATBOT_HOSTING.html
+
 # Pyre type checker
 .pyre/
 

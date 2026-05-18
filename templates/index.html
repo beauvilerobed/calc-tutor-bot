@@ -11,9 +11,6 @@
         <img src="{% static 'images/calc_bot.png' %}" alt="CaLaun" class="hero__icon">
         <h1 class="hero__title">CaLaun</h1>
         <p class="hero__subtitle">Calculus, one step at a time</p>
-        <p class="hero__description">
-            Stuck on a derivative or integral? Type it in and we'll walk you through it.
-        </p>
         <div class="hero__search">
             <form action="/input/" class="search-form search-form--hero" method="GET">
                 {{ form.i }}
@@ -25,50 +22,19 @@
 
 <!-- Features -->
 <section class="features">
-    <h2 class="section__title">Here's how it works</h2>
+    <h2 class="section__title">How it works</h2>
     <div class="features__grid">
         <div class="feature">
-            <div class="feature__icon">📝</div>
             <h3>Type it in</h3>
-            <p>Use notation like <code>diff(x^2, x)</code> or <code>integrate(sin(x), x)</code></p>
+            <p><code>diff(x^2, x)</code>, <code>integrate(sin(x), x)</code>, <code>limit((x^2-1)/(x-1), x, 1)</code></p>
         </div>
         <div class="feature">
-            <div class="feature__icon">📖</div>
             <h3>Follow along</h3>
-            <p>We'll show you each step so you can see what's happening</p>
+            <p>See every step.</p>
         </div>
         <div class="feature">
-            <div class="feature__icon">💬</div>
             <h3>Ask Calc Bot</h3>
-            <p>AI tutor explains the why — calculus only, 10 msgs/min</p>
-        </div>
-    </div>
-</section>
-
-<!-- Quick Examples -->
-<section class="quick-examples">
-    <h2 class="section__title">Jump right in</h2>
-    <div class="quick-examples__grid">
-        <div class="quick-example">
-            <h3>Derivatives</h3>
-            <p>See how to find the derivative</p>
-            <a href="/input/?i=diff(sin(x)*cos(x), x)" class="quick-example__link">
-                \(\frac{d}{dx}[\sin(x)\cos(x)]\)
-            </a>
-        </div>
-        <div class="quick-example">
-            <h3>Integrals</h3>
-            <p>Integration broken down</p>
-            <a href="/input/?i=integrate(x*exp(x), x)" class="quick-example__link">
-                \(\int x e^x \, dx\)
-            </a>
-        </div>
-        <div class="quick-example">
-            <h3>Limits</h3>
-            <p>Limits made clear</p>
-            <a href="/input/?i=limit(sin(x)/x, x, 0)" class="quick-example__link">
-                \(\lim_{x \to 0} \frac{\sin(x)}{x}\)
-            </a>
+            <p>Why each step works.</p>
         </div>
     </div>
 </section>
