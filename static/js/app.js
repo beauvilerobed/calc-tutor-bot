@@ -308,6 +308,68 @@ class Collapsible {
     }
 }
 
+// Expand display-math into a centered modal so wide equations can be viewed
+// without horizontal scrolling inside the step.
+class MathExpander {
+    constructor() {
+        this.modal = this.createModal();
+        this.attachDelegation();
+    }
+
+    createModal() {
+        const modal = document.createElement('div');
+        modal.className = 'math-modal';
+        modal.setAttribute('aria-hidden', 'true');
+        modal.innerHTML = `
+            <div class="math-modal__backdrop" data-modal-close></div>
+            <div class="math-modal__content" role="dialog" aria-modal="true" aria-label="Expanded equation">
+                <button type="button" class="math-modal__close" data-modal-close aria-label="Close">&times;</button>
+                <div class="math-modal__body"></div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        modal.querySelectorAll('[data-modal-close]').forEach(el => {
+            el.addEventListener('click', () => this.close());
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('open')) {
+                this.close();
+            }
+        });
+
+        return modal;
+    }
+
+    attachDelegation() {
+        // Capture-phase so we run before the step's collapse handler and can
+        // stop the click from toggling the surrounding step.
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.math-modal')) return;
+            const mathEl = e.target.closest('div.step__math');
+            if (!mathEl) return;
+            e.preventDefault();
+            e.stopPropagation();
+            this.open(mathEl);
+        }, true);
+    }
+
+    open(mathEl) {
+        const body = this.modal.querySelector('.math-modal__body');
+        body.innerHTML = mathEl.innerHTML;
+        this.modal.classList.add('open');
+        this.modal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('math-modal-open');
+    }
+
+    close() {
+        this.modal.classList.remove('open');
+        this.modal.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('math-modal-open');
+    }
+}
+
 // Card loader (for async card content)
 class CardLoader {
     constructor() {
@@ -492,6 +554,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Initialize collapsibles
     const collapsible = new Collapsible();
+
+    // Initialize math expand-to-modal (uses event delegation, handles late content)
+    new MathExpander();
     
     // Initialize card loader
     new CardLoader();
