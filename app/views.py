@@ -215,8 +215,11 @@ class LLMChatBotApiView(View):
             had_steps_context=bool(steps_html)
         )
         
-        # Get response
-        response = llm_response(msg, steps_html, history)
+        # Chatbot temporarily disabled — return a friendly disclaimer.
+        response = (
+            "Calaun is currently unavailable. "
+            "Please enjoy the step-by-step solution above!"
+        )
         
         result = JsonResponse({
             'text': response
