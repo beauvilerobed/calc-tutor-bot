@@ -15,7 +15,7 @@ import requests
 
 
 # System prompt that constrains the LLM to calculus topics only
-SYSTEM_PROMPT = """You are Calc Bot, a friendly calculus tutor. Help students understand derivatives, integrals, and limits.
+SYSTEM_PROMPT = """You are Calaun, a friendly calculus tutor. Help students understand derivatives, integrals, and limits.
 
 STYLE RULES:
 - Be concise. No filler phrases like "Does this make sense?" or "Do you have questions?"
