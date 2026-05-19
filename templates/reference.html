@@ -7,10 +7,6 @@
 <!-- Header -->
 <header class="header">
     <h1 class="header__title"><a href="/">CaLaun</a></h1>
-    <nav class="header__nav">
-        <a href="/" class="header__link">Home</a>
-        <button type="button" class="header__link" data-chat-trigger>Ask Away</button>
-    </nav>
 </header>
 
 <!-- Reference Guide -->
@@ -430,7 +426,10 @@
             <h3>L'Hôpital's Rule</h3>
             <div class="formula-grid">
                 <div class="formula-card formula-card--wide">
-                    <div class="formula-card__formula">\(\text{If } \lim_{x \to a} \frac{f(x)}{g(x)} = \frac{0}{0} \text{ or } \frac{\pm\infty}{\pm\infty}, \text{ then } \lim_{x \to a} \frac{f(x)}{g(x)} = \lim_{x \to a} \frac{f'(x)}{g'(x)}\)</div>
+                    <div class="formula-card__formula">
+                        <div>\(\text{If } \lim_{x \to a} \dfrac{f(x)}{g(x)} = \dfrac{0}{0} \text{ or } \dfrac{\pm\infty}{\pm\infty},\)</div>
+                        <div>\(\text{then } \lim_{x \to a} \dfrac{f(x)}{g(x)} = \lim_{x \to a} \dfrac{f'(x)}{g'(x)}\)</div>
+                    </div>
                     <div class="formula-card__name">L'Hôpital's Rule for Indeterminate Forms</div>
                     <a href="/input/?i=limit((exp(x)-1-x)/x^2, x, 0)" class="formula-card__try">Try: (eˣ-1-x)/x² →</a>
                 </div>
