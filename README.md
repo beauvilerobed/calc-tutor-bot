@@ -2,7 +2,7 @@
 
 A free, open-source Django calculus tutor that shows step-by-step solutions for derivatives, integrals, and limits. Includes an AI chatbot powered by a self-hosted open-weight LLM (Qwen2.5-Math-1.5B via Ollama).
 
-**Live:** [https://calaun.org](https://calaun.org) · **License:** MIT · **Status:** personal open-source project (not a non-profit; see [NONPROFIT.html](NONPROFIT.html))
+**Live:** [https://calaun.org](https://calaun.org) · **License:** MIT · **Status:** personal open-source project (not a non-profit;)
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
