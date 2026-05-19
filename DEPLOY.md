@@ -229,6 +229,7 @@ createdb calaun
 | `LLM_BASE_URL` | optional | `http://localhost:11434/v1` | OpenAI-compatible chat-completions base URL. Defaults to local Ollama. |
 | `LLM_API_KEY` | optional | unset | Bearer token for the LLM endpoint. Optional for local Ollama; required when exposing publicly. |
 | `LLM_MODEL` | optional | `qwen2.5:7b` | Model name to send to the endpoint. |
+| `CHATBOT_ENABLED` | optional | `True` | Emergency kill switch. Set to `False` and restart the service to short-circuit the chatbot with a graceful "currently unavailable" message (e.g. if Ollama is broken). |
 | `SECURE_SSL_REDIRECT` | optional | `True` | Honored only when `DEBUG=False`. |
 | `SECURE_HSTS_SECONDS` | optional | `31536000` | HSTS duration. |
 | `LOG_LEVEL` | optional | `INFO` | Standard logging levels. |

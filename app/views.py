@@ -9,6 +9,7 @@ from logic.logic import UserInput
 from mathtutor import settings
 from app.analytics import get_analytics, get_client_ip
 import json
+import os
 import urllib.parse
 import traceback
 import logging
@@ -215,12 +216,16 @@ class LLMChatBotApiView(View):
             had_steps_context=bool(steps_html)
         )
         
-        # Chatbot temporarily disabled — return a friendly disclaimer.
-        response = (
-            "Calaun is currently unavailable. "
-            "Please enjoy the step-by-step solution above!"
-        )
-        
+        # Emergency kill switch: set CHATBOT_ENABLED=False in the env to
+        # short-circuit the LLM call and return a graceful disclaimer.
+        if os.environ.get('CHATBOT_ENABLED', 'True').strip().lower() == 'false':
+            response = (
+                "Calaun is currently unavailable. "
+                "Please enjoy the step-by-step solution above!"
+            )
+        else:
+            response = llm_response(msg, steps_html=steps_html, conversation_history=history)
+
         result = JsonResponse({
             'text': response
         }, status=200)

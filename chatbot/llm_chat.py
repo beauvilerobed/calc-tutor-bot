@@ -206,10 +206,10 @@ class LLMStepHelper:
                 json={
                     "model": self.model,
                     "messages": messages,
-                    "max_tokens": 500,
+                    "max_tokens": 300,
                     "temperature": 0.7,
                 },
-                timeout=30
+                timeout=90
             )
             response.raise_for_status()
             data = response.json()
