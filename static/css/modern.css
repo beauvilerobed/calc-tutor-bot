@@ -423,6 +423,19 @@ body.math-modal-open {
     pointer-events: none;
 }
 
+/* "Click to show step" hint — only visible when the step is collapsed. */
+.step__hint {
+    display: none;
+}
+
+.step.collapsible:not(.open) > .step__hint {
+    display: inline-block;
+    color: var(--color-primary);
+    font-size: 0.875rem;
+    font-style: italic;
+    font-weight: 500;
+}
+
 /* Collapsed step: keep enough height for the step number badge and arrow,
    and re-center them vertically (the default top:1rem aligns the badge with
    the first line of content, which looks bottom-heavy when content is gone). */
