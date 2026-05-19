@@ -143,6 +143,7 @@ body {
 .search-form input[type="text"]::placeholder {
     color: #cbd5e1;
     opacity: 1;
+    font-size: 0.8rem;
 }
 
 .search-form button,

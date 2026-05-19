@@ -83,7 +83,7 @@ class SearchForm(forms.Form):
     i = forms.CharField(
         required=False,
         widget=TextInputWidget(attrs={
-            'placeholder': "Try a derivative, integral, or limit."
+            'placeholder': "Enter a problem — see examples below!"
         }),
     )
 
