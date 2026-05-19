@@ -8,12 +8,6 @@
 <!-- Header -->
 <header class="header">
     <h1 class="header__title"><a href="/">CaLaun</a></h1>
-    <nav class="header__nav">
-        <button type="button" class="header__link" data-chat-trigger>
-            <span class="chat-trigger__text">Ask Away</span>
-        </button>
-        <a href="/reference" class="header__link">Reference</a>
-    </nav>
 </header>
 
 <!-- Search -->
@@ -31,6 +25,10 @@
         <div class="results" id="resultsContainer">
             <div class="steps-controls">
                 <button id="toggleAllSteps" class="btn btn--secondary">Show all steps</button>
+                <button type="button" class="btn btn--secondary" data-chat-trigger>
+                    <span class="chat-trigger__text">Ask Away</span>
+                </button>
+                <a href="/reference" class="btn btn--secondary">Reference</a>
             </div>
             {% for cell in result %}
                 {% if cell.card|is_steps_card %}
