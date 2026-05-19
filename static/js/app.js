@@ -128,34 +128,53 @@ class ChatBot {
         // Show typing indicator
         const typingIndicator = document.createElement('div');
         typingIndicator.className = 'chat-message chat-message--bot chat-message--typing';
-        typingIndicator.innerHTML = '<span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>';
+        const dotsHTML = '<span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>';
+        typingIndicator.innerHTML = dotsHTML;
         this.chatLog?.appendChild(typingIndicator);
         this.chatLog?.scrollTo(0, this.chatLog.scrollHeight);
-        
+
+        // Progressive status updates so the user knows the chat isn't broken.
+        // Each entry: minimum elapsed seconds, message to show.
+        const statusUpdates = [
+            { atSec: 5,  text: 'Calaun is thinking' },
+            { atSec: 15, text: 'Still thinking &mdash; first responses can take ~20 seconds' },
+            { atSec: 30, text: 'Still working on it' },
+            { atSec: 60, text: 'Taking longer than usual &mdash; almost done' },
+        ];
+        const startTime = Date.now();
+        const statusTimer = setInterval(() => {
+            const elapsedSec = (Date.now() - startTime) / 1000;
+            const status = statusUpdates.filter(s => s.atSec <= elapsedSec).pop();
+            if (status) {
+                typingIndicator.innerHTML = `<span class="typing-status">${status.text}</span> ${dotsHTML}`;
+            }
+        }, 1000);
+
         try {
             // Build request body
             const body = { text };
-            
+
             if (this.useLLM) {
                 body.steps = this.getStepsContext();
                 body.history = this.conversationHistory.slice(0, -1); // Exclude current message
             }
-            
+
             const response = await fetch(this.apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body)
             });
-            
-            // Remove typing indicator
+
+            clearInterval(statusTimer);
             typingIndicator.remove();
-            
+
             if (!response.ok) throw new Error('Network error');
-            
+
             const data = await response.json();
             const responseText = Array.isArray(data.text) ? data.text[0] : data.text;
             this.addMessage(responseText || 'Sorry, I didn\'t understand that.');
         } catch (err) {
+            clearInterval(statusTimer);
             typingIndicator.remove();
             console.error('Chat error:', err);
             this.addMessage('Sorry, something went wrong. Please try again.');
