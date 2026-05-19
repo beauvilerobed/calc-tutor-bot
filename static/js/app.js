@@ -152,14 +152,82 @@ class ChatBot {
             'Plotting some sneaky points',
             'Asking my inner mathematician',
             'Doing some arithmetic gymnastics',
+            'Borrowing from the tens place',
+            'Polishing the integral sign',
+            'Untangling a stubborn polynomial',
+            'Whispering sweet nothings to a limit',
+            'Politely asking infinity to slow down',
+            'Looking for a lost decimal point',
+            'Sharpening my pencil (metaphorically)',
+            'Recalibrating the abacus',
+            'Tipping my hat to Newton',
+            'High-fiving Leibniz',
+            'Arguing with a denominator',
+            'Cornering a tricky derivative',
+            'Distributing politely',
+            'Factoring like nobody\'s watching',
+            'Chasing a runaway constant',
+            'Wrangling some wild exponents',
+            'Tracking down a missing minus sign',
+            'Squaring things up',
+            'Taming a hyperbolic function',
+            'Convincing a radical to behave',
+            'Coaxing the chain rule into action',
+            'Lining up the like terms',
+            'Cross-multiplying with feeling',
+            'Doing the long division shuffle',
+            'Substituting with style',
+            'Letting u = something clever',
+            'Completing the square (almost)',
+            'Calling in a quadratic favor',
+            'Asking the unit circle for directions',
+            'Brewing a fresh cup of coefficients',
+            'Doodling a quick number line',
+            'Rounding up the usual suspects',
+            'Carrying digits like grocery bags',
+            'Dusting off the Taylor series',
+            'Looking up trig identities I forgot',
+            'Bribing the calculator with batteries',
+            'Negotiating peace with imaginary numbers',
+            'Reminding myself what dx means',
+            'Drawing a tiny right triangle',
+            'Checking under the radical',
+            'Triple-checking my signs',
+            'Listening to what the slope is telling me',
+            'Asking the asymptote not to run away',
+            'Untying a knot in the parentheses',
+            'Tracing a curve with my finger',
+            'Plotting against the x-axis',
+            'Whispering &ldquo;is this on the test?&rdquo;',
+            'Reading the problem again, slowly',
+            'Pondering the meaning of <em>e</em>',
+            'Tucking in a loose exponent',
+            'Coaxing zero out of hiding',
+            'Looking for a common factor',
+            'Setting the equation equal to vibes',
+            'Doing math the old-fashioned way',
+            'Translating Greek letters into feelings',
+            'Pretending pi ends somewhere',
+            'Counting backwards from infinity',
+            'Tightening a loose summation',
+            'Inviting both sides to the same party',
+            'Politely asking the matrix to invert',
+            'Refusing to FOIL on principle',
+            'Lining up zeros like dominoes',
+            'Sweeping remainders under the rug',
+            'Doing the limit limbo',
+            'Decoding your handwriting (kidding)',
+            'Tutoring myself first, real quick',
+            'Checking the answer key in my head',
         ];
         const shuffledQuips = [...quips].sort(() => Math.random() - 0.5);
         const longWaitMessages = [
-            { atSec: 30, text: 'Still working on it &mdash; thanks for your patience' },
-            { atSec: 60, text: 'Taking longer than usual &mdash; almost done' },
+            { atSec: 30, text: 'Still working on it - thanks for your patience' },
+            { atSec: 60, text: 'Taking longer than usual - almost done' },
+            { atSec: 90, text: 'Wow, even I\'m shocked - again, thanks for your patience' },
         ];
 
-        typingIndicator.innerHTML = `<span class="typing-status">Calaun is thinking</span> ${dotsHTML}`;
+        typingIndicator.innerHTML = `<span class="typing-status">Thinking</span> ${dotsHTML}`;
         const startTime = Date.now();
         let quipIndex = -1;
         const statusTimer = setInterval(() => {
@@ -171,7 +239,7 @@ class ChatBot {
                 quipIndex = (quipIndex + 1) % shuffledQuips.length;
                 typingIndicator.innerHTML = `<span class="typing-status">${shuffledQuips[quipIndex]}</span> ${dotsHTML}`;
             }
-        }, 5000);
+        }, 4000);
 
         try {
             // Build request body
