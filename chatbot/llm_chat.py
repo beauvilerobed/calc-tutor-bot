@@ -30,30 +30,6 @@ DEFAULT_BASE_URL = "http://localhost:11434/v1"
 DEFAULT_MODEL = "qwen2.5:7b"
 
 
-_EXPLAIN_RE = re.compile(
-    r"\b(?:"
-    r"explain\w*|why|how\s+(?:do(?:es)?|did|can|come)|deriv(?!ative)\w+|"
-    r"prov\w+|intuit\w+|understand\w*|walk\s+(?:me\s+)?through|"
-    r"show\s+me\s+how|teach\w*|tell\s+me|mean(?:s|ing)?|reason\w*|"
-    r"justif\w+|break\s*down|step\s*by\s*step|elaborat\w+|clarif\w+|"
-    r"confus\w+|help\s+(?:me\s+)?understand|logic\s+behind|"
-    r"motivation|in\s+depth|where\s+(?:does|did)|"
-    r"concept\w*|big\s+picture|"
-    r"(?:this|that|which)\s+step|step\s+\d+"
-    r")\b"
-)
-
-_QUICK_RE = re.compile(
-    r"\b(?:"
-    r"what(?:'s|\s+is)|define\w*|definition|formula\w*|"
-    r"just\s+the|name\s+of|symbol\s+for|notation|quick|"
-    r"brief\w*|short|nutshell|tl;?dr|summar\w+|list|"
-    r"types?\s+of|kinds?\s+of|abbreviat\w+|called|rule\s+for|"
-    r"give\s+me\s+the"
-    r")\b"
-)
-
-
 class LLMStepHelper:
     """An LLM-based assistant that helps students understand calculus solution steps."""
 
@@ -106,14 +82,6 @@ class LLMStepHelper:
         
         return False
     
-    def _token_budget(self, message):
-        msg = message.lower()
-        if _EXPLAIN_RE.search(msg):
-            return 350
-        if _QUICK_RE.search(msg):
-            return 80
-        return 120
-
     def _format_steps_context(self, steps_html):
         """
         Extract readable text from HTML steps for context.
@@ -211,7 +179,7 @@ class LLMStepHelper:
                 json={
                     "model": self.model,
                     "messages": messages,
-                    "max_tokens": self._token_budget(message),
+                    "max_tokens": 500,
                     "temperature": 0.7,
                 },
                 timeout=90
