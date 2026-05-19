@@ -77,9 +77,8 @@ The chatbot talks to any OpenAI-compatible chat-completions endpoint via env var
 - Explains calculus concepts and rules
 - Understands the current solution steps as context
 - Uses proper LaTeX formatting in responses
-- Never solves problems directly (encourages learning)
 
-See [chatbot/README.md](chatbot/README.md) for more details and [CHATBOT_HOSTING.html](CHATBOT_HOSTING.html) for the self-hosting plan.
+See [chatbot/README.md](chatbot/README.md) for more details.
 
 ## Testing
 
