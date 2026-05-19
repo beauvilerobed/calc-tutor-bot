@@ -17,44 +17,41 @@ import requests
 
 
 # System prompt that constrains the LLM to calculus topics only
-SYSTEM_PROMPT = """You are Calaun, a friendly calculus tutor. Help students understand derivatives, integrals, and limits.
+SYSTEM_PROMPT = """You are Calaun, a calculus tutor. Help with derivatives, integrals, and limits.
 
-STYLE RULES:
-- Be concise. No filler phrases like "Does this make sense?" or "Do you have questions?"
-- ALWAYS wrap LaTeX in proper delimiters: \\( ... \\) for inline math, \\[ ... \\] for display math
-- NEVER use bare LaTeX like \\frac without delimiters - ALWAYS wrap it!
-- One short paragraph max, then show the general formula
-- Be warm but brief
-
-LATEX FORMATTING (CRITICAL):
-- Inline: "The derivative \\( \\frac{dy}{dx} \\) represents..."
-- Display: "The power rule is: \\[ \\frac{d}{dx} x^n = n \\cdot x^{n-1} \\]"
-- WRONG: "\\frac{1}{2}" (missing delimiters!)
-- RIGHT: "\\( \\frac{1}{2} \\)" or "\\[ \\frac{1}{2} \\]"
-
-CRITICAL - DO NOT CALCULATE:
-- NEVER compute numerical answers, evaluate expressions, or solve problems
-- NEVER state what a limit, derivative, or integral equals
-- If asked "what is the answer" or for any specific calculation, say: "Check the steps above for the answer, or type a new expression in the search box!"
-- You explain CONCEPTS and RULES only - the solver does all calculations
-- If steps are shown, refer to them but don't recalculate or verify numbers
-
-EXAMPLE GOOD RESPONSE for "what's the power rule?":
-"The **power rule**: bring down the exponent, then subtract 1.
-
-\\[ \\frac{d}{dx} x^n = n \\cdot x^{n-1} \\]"
-
-EXAMPLE BAD RESPONSE (never do this):
-"The answer is 5" or "The limit equals 2" or "2x^2 + 3 gives us..."
-
-SCOPE:
-- Only answer calculus questions
-- If off-topic, say: "I'm here to help with calculus! Ask me about derivatives, integrals, or limits."
-- Explain the general concept/rule, never the specific numerical result"""
+RULES:
+- Be brief: 1-2 sentences, then the formula. No filler, no "does this make sense?"
+- Wrap ALL math in LaTeX delimiters: \\( ... \\) inline, \\[ ... \\] for display. Never write bare \\frac.
+- Explain the rule, never compute. If asked for a numerical answer, say: "Check the steps above, or try a new expression in the search box."
+- If off-topic, say: "I'm here to help with calculus! Ask me about derivatives, integrals, or limits.\""""
 
 
 DEFAULT_BASE_URL = "http://localhost:11434/v1"
 DEFAULT_MODEL = "qwen2.5:7b"
+
+
+_EXPLAIN_RE = re.compile(
+    r"\b(?:"
+    r"explain\w*|why|how\s+(?:do(?:es)?|did|can|come)|deriv(?!ative)\w+|"
+    r"prov\w+|intuit\w+|understand\w*|walk\s+(?:me\s+)?through|"
+    r"show\s+me\s+how|teach\w*|tell\s+me|mean(?:s|ing)?|reason\w*|"
+    r"justif\w+|break\s*down|step\s*by\s*step|elaborat\w+|clarif\w+|"
+    r"confus\w+|help\s+(?:me\s+)?understand|logic\s+behind|"
+    r"motivation|in\s+depth|where\s+(?:does|did)|"
+    r"concept\w*|big\s+picture|"
+    r"(?:this|that|which)\s+step|step\s+\d+"
+    r")\b"
+)
+
+_QUICK_RE = re.compile(
+    r"\b(?:"
+    r"what(?:'s|\s+is)|define\w*|definition|formula\w*|"
+    r"just\s+the|name\s+of|symbol\s+for|notation|quick|"
+    r"brief\w*|short|nutshell|tl;?dr|summar\w+|list|"
+    r"types?\s+of|kinds?\s+of|abbreviat\w+|called|rule\s+for|"
+    r"give\s+me\s+the"
+    r")\b"
+)
 
 
 class LLMStepHelper:
@@ -109,6 +106,14 @@ class LLMStepHelper:
         
         return False
     
+    def _token_budget(self, message):
+        msg = message.lower()
+        if _EXPLAIN_RE.search(msg):
+            return 350
+        if _QUICK_RE.search(msg):
+            return 80
+        return 120
+
     def _format_steps_context(self, steps_html):
         """
         Extract readable text from HTML steps for context.
@@ -206,7 +211,7 @@ class LLMStepHelper:
                 json={
                     "model": self.model,
                     "messages": messages,
-                    "max_tokens": 500,
+                    "max_tokens": self._token_budget(message),
                     "temperature": 0.7,
                 },
                 timeout=90

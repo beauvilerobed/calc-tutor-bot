@@ -104,6 +104,7 @@ class HTMLPrinter(LaTeXPrinter):
         indent = ' ' * 4 * self.level
         self.step_counter += 1
         self.lines.append(f'{indent}<li class="step collapsible" data-step="{self.step_counter}">')
+        self.lines.append(f'{indent}    <span class="step__hint" aria-hidden="true">Click to show step</span>')
         yield self.level
         self.lines.append(f'{indent}</li>')
 

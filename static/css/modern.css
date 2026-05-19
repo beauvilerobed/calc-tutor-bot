@@ -143,6 +143,7 @@ body {
 .search-form input[type="text"]::placeholder {
     color: #cbd5e1;
     opacity: 1;
+    font-size: 0.8rem;
 }
 
 .search-form button,
@@ -422,6 +423,19 @@ body.math-modal-open {
     pointer-events: none;
 }
 
+/* "Click to show step" hint — only visible when the step is collapsed. */
+.step__hint {
+    display: none;
+}
+
+.step.collapsible:not(.open) > .step__hint {
+    display: inline-block;
+    color: var(--color-primary);
+    font-size: 0.875rem;
+    font-style: italic;
+    font-weight: 500;
+}
+
 /* Collapsed step: keep enough height for the step number badge and arrow,
    and re-center them vertically (the default top:1rem aligns the badge with
    the first line of content, which looks bottom-heavy when content is gone). */
@@ -514,12 +528,17 @@ span.step__math {
 }
 
 .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 0.625rem 1.25rem;
     font-size: 0.875rem;
     font-weight: 600;
+    font-family: inherit;
     border: none;
     border-radius: var(--radius-md);
     cursor: pointer;
+    text-decoration: none;
     transition: all var(--transition);
     box-shadow: var(--shadow-sm);
 }

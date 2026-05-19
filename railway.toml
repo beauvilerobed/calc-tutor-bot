@@ -1,5 +1,0 @@
-[build]
-builder = "nixpacks"
-
-[deploy]
-startCommand = "python manage.py migrate && gunicorn mathtutor.wsgi --bind 0.0.0.0:$PORT"

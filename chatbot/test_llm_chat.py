@@ -143,6 +143,76 @@ class TestLLMStepHelper(unittest.TestCase):
         self.assertGreaterEqual(len(user_messages), 2)
 
 
+class TestTokenBudget(unittest.TestCase):
+    """Tests for the dynamic max_tokens budget."""
+
+    def setUp(self):
+        self.helper = LLMStepHelper(api_key='test-key')
+
+    def test_explain_questions_get_longest_budget(self):
+        for msg in [
+            "explain why the chain rule works",
+            "how do you integrate by parts",
+            "how does the chain rule work",
+            "how did you get step 2",
+            "where did the 2 come from",
+            "derive the quotient rule",
+            "show me the derivation",
+            "walk me through step 2",
+            "I am confused about this step",
+            "what's the intuition behind limits",
+            "where did you get that",
+        ]:
+            self.assertEqual(self.helper._token_budget(msg), 350, msg=msg)
+
+    def test_quick_questions_get_shortest_budget(self):
+        for msg in [
+            "what is the power rule",
+            "what's the derivative of x^2",
+            "formula for derivative of sin",
+            "definition of continuity",
+            "tldr on limits",
+            "give me the formula",
+            "summarize integration",
+        ]:
+            self.assertEqual(self.helper._token_budget(msg), 80, msg=msg)
+
+    def test_other_questions_get_default_budget(self):
+        for msg in [
+            "is x^2 differentiable",
+            "can I use u-substitution here",
+        ]:
+            self.assertEqual(self.helper._token_budget(msg), 120, msg=msg)
+
+    def test_explain_beats_quick_when_both_match(self):
+        # "what is" would match quick, but "explain" wins.
+        self.assertEqual(
+            self.helper._token_budget("explain what is the chain rule"),
+            350,
+        )
+
+    def test_derivative_noun_does_not_trigger_explain(self):
+        # "derivative" is the noun, not the verb — should not classify as explain.
+        self.assertNotEqual(
+            self.helper._token_budget("formula for the derivative of x^2"),
+            350,
+        )
+
+    @patch('chatbot.llm_chat.requests.post')
+    def test_budget_flows_through_to_api_call(self, mock_post):
+        mock_response = MagicMock()
+        mock_response.json.return_value = {
+            "choices": [{"message": {"content": "ok"}}]
+        }
+        mock_response.raise_for_status = MagicMock()
+        mock_post.return_value = mock_response
+
+        self.helper.get_response("explain why the chain rule works")
+
+        sent = mock_post.call_args.kwargs['json']
+        self.assertEqual(sent['max_tokens'], 350)
+
+
 class TestLLMResponseFunction(unittest.TestCase):
     """Tests for the llm_response convenience function."""
     

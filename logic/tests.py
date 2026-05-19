@@ -213,7 +213,7 @@ class TestLimits(unittest.TestCase):
         # Test that steps are generated with the 1^infinity form
         html = limit_html_steps(expr, self.x, oo)
         self.assertIn('indeterminate', html.lower())
-        self.assertIn('logarithm', html.lower())
+        self.assertIn('log technique', html.lower())
 
     def test_limit_steps_generates_html(self):
         """Test that limit_html_steps generates HTML output."""
@@ -241,7 +241,7 @@ class TestLimits(unittest.TestCase):
         """Test special limit sin(x)/x -> 1."""
         expr = sin(self.x) / self.x
         html = limit_html_steps(expr, self.x, 0)
-        self.assertIn("fundamental trigonometric limit", html)
+        self.assertIn("Standard trig limit", html)
 
 
 class TestEvalUtility(unittest.TestCase):
