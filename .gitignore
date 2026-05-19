@@ -139,6 +139,7 @@ dmypy.json
 
 # Local reference notes (not for the repo)
 CHATBOT_HOSTING.html
+CALAUN_OPS.html
 
 # Pyre type checker
 .pyre/
