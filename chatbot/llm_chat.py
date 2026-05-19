@@ -206,7 +206,7 @@ class LLMStepHelper:
                 json={
                     "model": self.model,
                     "messages": messages,
-                    "max_tokens": 300,
+                    "max_tokens": 500,
                     "temperature": 0.7,
                 },
                 timeout=90

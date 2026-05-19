@@ -171,7 +171,7 @@ class ChatBot {
                 quipIndex = (quipIndex + 1) % shuffledQuips.length;
                 typingIndicator.innerHTML = `<span class="typing-status">${shuffledQuips[quipIndex]}</span> ${dotsHTML}`;
             }
-        }, 2000);
+        }, 3000);
 
         try {
             // Build request body
