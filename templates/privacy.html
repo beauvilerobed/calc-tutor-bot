@@ -110,7 +110,7 @@
 
     <div class="privacy-card">
         <h1>Privacy Policy</h1>
-        <p class="last-updated">Last updated: 2026-05-04</p>
+        <p class="last-updated">Last updated: 2026-05-19</p>
 
         <div class="toc-callout">
             <strong>The short version.</strong> CaLaun does not collect personal information from anyone &mdash; no accounts, no email addresses, no names. The full details are below.
@@ -144,15 +144,13 @@
         <h2>Third parties we share data with</h2>
         <p>We use the following infrastructure providers to operate the service. Each is bound by its own privacy policy:</p>
         <ul>
-            <li><strong>Render</strong> &mdash; application hosting (<a href="https://render.com/policies/privacy" target="_blank" rel="noopener">privacy policy</a>)</li>
-            <li><strong>Neon</strong> &mdash; PostgreSQL database (<a href="https://neon.com/privacy-policy" target="_blank" rel="noopener">privacy policy</a>)</li>
-            <li><strong>Hetzner Online</strong> &mdash; virtual server hosting the self-hosted AI chatbot (<a href="https://www.hetzner.com/legal/privacy-policy/" target="_blank" rel="noopener">privacy policy</a>)</li>
-            <li><strong>Cloudflare</strong> &mdash; CDN / TLS termination via Render (<a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">privacy policy</a>)</li>
+            <li><strong>Hetzner Online</strong> &mdash; virtual server hosting the application, database, and self-hosted AI chatbot (<a href="https://www.hetzner.com/legal/privacy-policy/" target="_blank" rel="noopener">privacy policy</a>)</li>
+            <li><strong>Let's Encrypt (ISRG)</strong> &mdash; HTTPS certificate authority (<a href="https://letsencrypt.org/privacy/" target="_blank" rel="noopener">privacy policy</a>)</li>
         </ul>
         <p>We do not sell, rent, or trade any user data. We do not have advertising partners.</p>
 
         <h2>Data security</h2>
-        <p>The site is served exclusively over HTTPS. All inter-service traffic (including database connections) requires TLS. Application secrets are managed via Render's encrypted environment-variable storage. Source code is publicly auditable on <a href="https://github.com/calaun-learning/calaun" target="_blank" rel="noopener">GitHub</a>.</p>
+        <p>The site is served exclusively over HTTPS (TLS certificate issued by Let's Encrypt). Application secrets are stored as restricted-permission environment variables on the Hetzner server. Source code is publicly auditable on <a href="https://github.com/calaun-learning/calaun" target="_blank" rel="noopener">GitHub</a>.</p>
 
         <h2>Your rights</h2>
         <p>Because we don't link any data to your identity, there is no personal data record for us to retrieve, correct, or delete on request. If you have specific privacy concerns, contact us at the address below and we will do our best to address them.</p>
