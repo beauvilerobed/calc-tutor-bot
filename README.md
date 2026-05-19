@@ -1,6 +1,8 @@
 # CaLaun
 
-A Django-based calculus tutor that shows step-by-step solutions for derivatives, integrals, and limits. Includes an AI chatbot powered by a self-hosted open-weight LLM (Qwen2.5-Math via Ollama).
+A free, open-source Django calculus tutor that shows step-by-step solutions for derivatives, integrals, and limits. Includes an AI chatbot powered by a self-hosted open-weight LLM (Qwen2.5-Math-1.5B via Ollama).
+
+**Live:** [https://calaun.org](https://calaun.org) · **License:** MIT · **Status:** personal open-source project (not a non-profit; see [NONPROFIT.html](NONPROFIT.html))
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
@@ -40,8 +42,8 @@ The results page shows step-by-step solutions with an AI chatbot sidebar:
 3. **Set up the AI chatbot (optional but recommended):**
    ```bash
    # Install Ollama from https://ollama.com, then:
-   ollama pull qwen2.5:7b
-   # The defaults (LLM_BASE_URL=http://localhost:11434/v1, LLM_MODEL=qwen2.5:7b)
+   ollama pull qwen2.5:1.5B
+   # The defaults (LLM_BASE_URL=http://localhost:11434/v1, LLM_MODEL=qwen2.5:1.5B)
    # already point at a local Ollama, so no env vars needed for local dev.
    ```
 
@@ -73,7 +75,7 @@ Enter calculus expressions like:
 
 ## AI Chatbot
 
-The chatbot talks to any OpenAI-compatible chat-completions endpoint via env vars (`LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`). Production runs Qwen2.5-Math-7B on self-hosted Ollama. It:
+The chatbot talks to any OpenAI-compatible chat-completions endpoint via env vars (`LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`). Production runs Qwen2.5-Math-1.5B on self-hosted Ollama. It:
 - Explains calculus concepts and rules
 - Understands the current solution steps as context
 - Uses proper LaTeX formatting in responses
@@ -83,7 +85,7 @@ See [chatbot/README.md](chatbot/README.md) for more details.
 ## Testing
 
 ```bash
-python manage.py test        # Run all tests (85 tests)
+python manage.py test        # Run all tests
 python -m pytest logic/      # Run logic tests only
 python -m pytest chatbot/    # Run chatbot tests only
 ```
@@ -92,9 +94,15 @@ python -m pytest chatbot/    # Run chatbot tests only
 
 - **Backend:** Django 4.2
 - **Math Engine:** SymPy
-- **AI Chatbot:** Ollama + Qwen2.5-Math-7B (self-hosted, OpenAI-compatible API)
+- **AI Chatbot:** Ollama + Qwen2.5-Math-1.5B (self-hosted, OpenAI-compatible API)
 - **Frontend:** Vanilla ES6 JavaScript, MathJax 3, CSS custom properties
 - **Database:** SQLite (dev) / PostgreSQL (prod via DATABASE_URL)
+
+## Production deployment
+
+The live site at [calaun.org](https://calaun.org) runs on a single Hetzner Cloud CCX13 VPS (~$20/month) hosting Django, PostgreSQL, and Ollama (running Qwen2.5-Math-1.5B) all on the same box. Django talks to Ollama over `localhost:11434`. See [DEPLOY.md](DEPLOY.md) for the deployment guide.
+
+Required env vars in production: `SECRET_KEY`, `DEBUG=False`, `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS`, `DATABASE_URL`, `LLM_BASE_URL` (typically `http://localhost:11434/v1`), `LLM_MODEL` (typically `qwen2.5:1.5b`).
 
 ## Project Structure
 
@@ -121,4 +129,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Support
 
-If you find this project helpful, [reach out to support CaLaun](mailto:rbeauvile@calaun.org?subject=Supporting%20CaLaun).
+If you find this project helpful and want to chip in toward the ~$20/month hosting bill, you can:
+
+- Use [GitHub Sponsors](https://github.com/sponsors/beauvilerobed) (one-time or recurring)
+- Email [rbeauvile@calaun.org](mailto:rbeauvile@calaun.org?subject=Supporting%20CaLaun) with any other ideas
+
+CaLaun is a personal open-source project, not a 501(c)(3), so contributions are **not** tax-deductible. See [NONPROFIT.html](NONPROFIT.html) for context.
