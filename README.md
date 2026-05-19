@@ -1,13 +1,13 @@
 # CaLaun
 
-A Django-based calculus tutor that shows step-by-step solutions for derivatives, integrals, and limits. Includes an AI chatbot powered by Groq's free LLM API.
+A Django-based calculus tutor that shows step-by-step solutions for derivatives, integrals, and limits. Includes an AI chatbot powered by a self-hosted open-weight LLM (Qwen2.5-Math via Ollama).
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ## Features
 
 - **Step-by-step solutions** for derivatives, integrals, and limits
-- **AI chatbot sidebar** that explains calculus concepts (powered by Groq/Llama 3.1)
+- **AI chatbot sidebar** that explains calculus concepts (powered by Qwen2.5-Math via self-hosted Ollama)
 - **Reference page** with common formulas and "try it" links
 
 ## Screenshots
@@ -21,7 +21,7 @@ The results page shows step-by-step solutions with an AI chatbot sidebar:
 
 - Python 3.9+ (tested with Python 3.12)
 - pip
-- (Optional) Groq API key for AI chatbot
+- (Optional) [Ollama](https://ollama.com) running locally for the AI chatbot
 
 ## Setup
 
@@ -39,8 +39,10 @@ The results page shows step-by-step solutions with an AI chatbot sidebar:
 
 3. **Set up the AI chatbot (optional but recommended):**
    ```bash
-   # Get a free API key at https://console.groq.com/keys
-   export GROQ_API_KEY="gsk_your_key_here"
+   # Install Ollama from https://ollama.com, then:
+   ollama pull qwen2.5:7b
+   # The defaults (LLM_BASE_URL=http://localhost:11434/v1, LLM_MODEL=qwen2.5:7b)
+   # already point at a local Ollama, so no env vars needed for local dev.
    ```
 
 4. **Run the development server:**
@@ -71,13 +73,13 @@ Enter calculus expressions like:
 
 ## AI Chatbot
 
-The chatbot uses Groq's free API to run Llama 3.1. It:
+The chatbot talks to any OpenAI-compatible chat-completions endpoint via env vars (`LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`). Production runs Qwen2.5-Math-7B on self-hosted Ollama. It:
 - Explains calculus concepts and rules
 - Understands the current solution steps as context
 - Uses proper LaTeX formatting in responses
 - Never solves problems directly (encourages learning)
 
-See [chatbot/README.md](chatbot/README.md) for more details.
+See [chatbot/README.md](chatbot/README.md) for more details and [CHATBOT_HOSTING.html](CHATBOT_HOSTING.html) for the self-hosting plan.
 
 ## Testing
 
@@ -91,7 +93,7 @@ python -m pytest chatbot/    # Run chatbot tests only
 
 - **Backend:** Django 4.2
 - **Math Engine:** SymPy
-- **AI Chatbot:** Groq API (Llama 3.1)
+- **AI Chatbot:** Ollama + Qwen2.5-Math-7B (self-hosted, OpenAI-compatible API)
 - **Frontend:** Vanilla ES6 JavaScript, MathJax 3, CSS custom properties
 - **Database:** SQLite (dev) / PostgreSQL (prod via DATABASE_URL)
 
@@ -100,7 +102,7 @@ python -m pytest chatbot/    # Run chatbot tests only
 ```
 ├── app/                 # Django app (views, URLs, template tags)
 ├── chatbot/             # AI chatbot module
-│   ├── llm_chat.py      # Groq/Llama chatbot
+│   ├── llm_chat.py      # Chatbot client (OpenAI-compatible, defaults to local Ollama)
 │   └── README.md        # Chatbot documentation
 ├── logic/               # Math solving logic
 │   ├── diffsteps.py     # Derivative steps
@@ -118,6 +120,6 @@ python -m pytest chatbot/    # Run chatbot tests only
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Sponsors
+## Support
 
-If you find this project helpful, [reach out to support CaLaun](mailto:rbeauvile@calaun.org?subject=Supporting%20CaLaun). 501(c)(3) status is pending IRS approval — once granted, tax-deductible donations will be available via this same address.
+If you find this project helpful, [reach out to support CaLaun](mailto:rbeauvile@calaun.org?subject=Supporting%20CaLaun).
