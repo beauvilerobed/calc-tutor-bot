@@ -32,13 +32,14 @@ DEFAULT_MODEL = "qwen2.5:7b"
 
 _EXPLAIN_RE = re.compile(
     r"\b(?:"
-    r"explain\w*|why|how\s+do(?:es)?|deriv(?!ative)\w+|prov\w+|intuit\w+|"
-    r"understand\w*|walk\s+(?:me\s+)?through|show\s+me\s+how|"
-    r"teach\w*|tell\s+me|mean(?:s|ing)?|reason\w*|justif\w+|"
-    r"break\s*down|step\s*by\s*step|elaborat\w+|clarif\w+|"
+    r"explain\w*|why|how\s+(?:do(?:es)?|did|can|come)|deriv(?!ative)\w+|"
+    r"prov\w+|intuit\w+|understand\w*|walk\s+(?:me\s+)?through|"
+    r"show\s+me\s+how|teach\w*|tell\s+me|mean(?:s|ing)?|reason\w*|"
+    r"justif\w+|break\s*down|step\s*by\s*step|elaborat\w+|clarif\w+|"
     r"confus\w+|help\s+(?:me\s+)?understand|logic\s+behind|"
-    r"motivation|in\s+depth|where\s+does\s+it\s+come\s+from|"
-    r"concept\w*|big\s+picture"
+    r"motivation|in\s+depth|where\s+(?:does|did)|"
+    r"concept\w*|big\s+picture|"
+    r"(?:this|that|which)\s+step|step\s+\d+"
     r")\b"
 )
 
@@ -108,7 +109,7 @@ class LLMStepHelper:
     def _token_budget(self, message):
         msg = message.lower()
         if _EXPLAIN_RE.search(msg):
-            return 200
+            return 350
         if _QUICK_RE.search(msg):
             return 80
         return 120

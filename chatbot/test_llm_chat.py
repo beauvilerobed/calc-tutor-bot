@@ -154,13 +154,16 @@ class TestTokenBudget(unittest.TestCase):
             "explain why the chain rule works",
             "how do you integrate by parts",
             "how does the chain rule work",
+            "how did you get step 2",
+            "where did the 2 come from",
             "derive the quotient rule",
             "show me the derivation",
             "walk me through step 2",
             "I am confused about this step",
             "what's the intuition behind limits",
+            "where did you get that",
         ]:
-            self.assertEqual(self.helper._token_budget(msg), 200, msg=msg)
+            self.assertEqual(self.helper._token_budget(msg), 350, msg=msg)
 
     def test_quick_questions_get_shortest_budget(self):
         for msg in [
@@ -185,14 +188,14 @@ class TestTokenBudget(unittest.TestCase):
         # "what is" would match quick, but "explain" wins.
         self.assertEqual(
             self.helper._token_budget("explain what is the chain rule"),
-            200,
+            350,
         )
 
     def test_derivative_noun_does_not_trigger_explain(self):
         # "derivative" is the noun, not the verb — should not classify as explain.
         self.assertNotEqual(
             self.helper._token_budget("formula for the derivative of x^2"),
-            200,
+            350,
         )
 
     @patch('chatbot.llm_chat.requests.post')
@@ -207,7 +210,7 @@ class TestTokenBudget(unittest.TestCase):
         self.helper.get_response("explain why the chain rule works")
 
         sent = mock_post.call_args.kwargs['json']
-        self.assertEqual(sent['max_tokens'], 200)
+        self.assertEqual(sent['max_tokens'], 350)
 
 
 class TestLLMResponseFunction(unittest.TestCase):
