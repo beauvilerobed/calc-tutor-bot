@@ -137,21 +137,21 @@ class ChatBot {
         // the wait feels alive rather than broken. Long-wait reassurance
         // messages take over after 30 / 60 seconds.
         const quips = [
-            'Differentiating quickly',
-            'Consulting my mental whiteboard',
-            'Crunching some derivatives',
-            'Pretending I\'m not just guessing',
-            'Wrangling some integrals',
-            'Drawing imaginary graphs',
-            'Counting on my fingers, just in case',
-            'Reaching for the right formula',
-            'Asking my inner math nerd',
-            'Polishing the explanation',
-            'Reviewing the textbook in my head',
-            'Hmm, is that the chain rule or product rule?',
-            'Carrying the one',
-            'Just one more limit to evaluate',
-            'Sympathizing with your homework',
+            'Carrying the one (it always matters)',
+            'Solving for x &mdash; where did you go, x?',
+            'Pretending I\'m a TI-89',
+            'Wrestling with PEMDAS',
+            'Negotiating with the equation',
+            'Counting on my fingers (you didn\'t see that)',
+            'Convincing the variables to cooperate',
+            'Resisting the urge to divide by zero',
+            'Channeling my inner Euler',
+            'Consulting Pythagoras (he\'s busy)',
+            'Reducing fractions, the cardio of math',
+            'Drawing graphs in my head',
+            'Plotting some sneaky points',
+            'Asking my inner mathematician',
+            'Doing some arithmetic gymnastics',
         ];
         const shuffledQuips = [...quips].sort(() => Math.random() - 0.5);
         const longWaitMessages = [
