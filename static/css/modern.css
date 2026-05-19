@@ -1809,6 +1809,11 @@ mjx-container[display="true"] {
     gap: 0.5rem;
     box-shadow: var(--shadow-sm);
     transition: all var(--transition);
+    min-width: 0;
+}
+
+.formula-card__formula mjx-container {
+    max-width: 100%;
 }
 
 .formula-card:hover {
@@ -1825,6 +1830,9 @@ mjx-container[display="true"] {
     color: var(--color-text);
     text-align: center;
     padding: 0.5rem 0;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
 .formula-card__name {
