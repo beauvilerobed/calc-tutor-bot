@@ -133,22 +133,45 @@ class ChatBot {
         this.chatLog?.appendChild(typingIndicator);
         this.chatLog?.scrollTo(0, this.chatLog.scrollHeight);
 
-        // Progressive status updates so the user knows the chat isn't broken.
-        // Each entry: minimum elapsed seconds, message to show.
-        const statusUpdates = [
-            { atSec: 5,  text: 'Calaun is thinking' },
-            { atSec: 15, text: 'Still thinking &mdash; first responses can take ~20 seconds' },
-            { atSec: 30, text: 'Still working on it' },
+        // Show "Calaun is thinking" immediately, then rotate light quips so
+        // the wait feels alive rather than broken. Long-wait reassurance
+        // messages take over after 30 / 60 seconds.
+        const quips = [
+            'Carrying the one (it always matters)',
+            'Solving for x &mdash; where did you go, x?',
+            'Pretending I\'m a TI-89',
+            'Wrestling with PEMDAS',
+            'Negotiating with the equation',
+            'Counting on my fingers (you didn\'t see that)',
+            'Convincing the variables to cooperate',
+            'Resisting the urge to divide by zero',
+            'Channeling my inner Euler',
+            'Consulting Pythagoras (he\'s busy)',
+            'Reducing fractions, the cardio of math',
+            'Drawing graphs in my head',
+            'Plotting some sneaky points',
+            'Asking my inner mathematician',
+            'Doing some arithmetic gymnastics',
+        ];
+        const shuffledQuips = [...quips].sort(() => Math.random() - 0.5);
+        const longWaitMessages = [
+            { atSec: 30, text: 'Still working on it &mdash; thanks for your patience' },
             { atSec: 60, text: 'Taking longer than usual &mdash; almost done' },
         ];
+
+        typingIndicator.innerHTML = `<span class="typing-status">Calaun is thinking</span> ${dotsHTML}`;
         const startTime = Date.now();
+        let quipIndex = -1;
         const statusTimer = setInterval(() => {
             const elapsedSec = (Date.now() - startTime) / 1000;
-            const status = statusUpdates.filter(s => s.atSec <= elapsedSec).pop();
-            if (status) {
-                typingIndicator.innerHTML = `<span class="typing-status">${status.text}</span> ${dotsHTML}`;
+            const longWait = longWaitMessages.filter(m => m.atSec <= elapsedSec).pop();
+            if (longWait) {
+                typingIndicator.innerHTML = `<span class="typing-status">${longWait.text}</span> ${dotsHTML}`;
+            } else {
+                quipIndex = (quipIndex + 1) % shuffledQuips.length;
+                typingIndicator.innerHTML = `<span class="typing-status">${shuffledQuips[quipIndex]}</span> ${dotsHTML}`;
             }
-        }, 1000);
+        }, 5000);
 
         try {
             // Build request body
