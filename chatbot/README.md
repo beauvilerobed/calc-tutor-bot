@@ -10,7 +10,6 @@ An AI-powered chatbot that helps students understand calculus solution steps. Ta
 - **Teaching-focused**: Explains concepts without giving direct answers
 - **Conversation memory**: Remembers previous messages in the chat
 - **LaTeX support**: Responds with mathematical notation
-- **Dynamic reply length**: Caps response tokens based on question intent — quick lookups ("what's the power rule") get short answers; "explain why / how does" questions get longer ones
 
 ## Setup
 
