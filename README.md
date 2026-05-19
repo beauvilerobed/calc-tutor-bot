@@ -134,4 +134,4 @@ If you find this project helpful and want to chip in toward the ~$20/month hosti
 - Use [GitHub Sponsors](https://github.com/sponsors/beauvilerobed) (one-time or recurring)
 - Email [rbeauvile@calaun.org](mailto:rbeauvile@calaun.org?subject=Supporting%20CaLaun) with any other ideas
 
-CaLaun is a personal open-source project, not a 501(c)(3), so contributions are **not** tax-deductible. See [NONPROFIT.html](NONPROFIT.html) for context.
+CaLaun is a personal open-source project, not a 501(c)(3), so contributions are **not** tax-deductible.
