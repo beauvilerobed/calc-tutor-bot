@@ -1,4 +1,4 @@
-"""Tests for the LLM Step Helper chatbot (using Groq)."""
+"""Tests for the LLM Step Helper chatbot."""
 
 import unittest
 from unittest.mock import patch, MagicMock
@@ -39,17 +39,6 @@ class TestLLMStepHelper(unittest.TestCase):
         self.assertTrue(helper._is_calculus_related("Why did we do that step?", has_steps=True))
         self.assertTrue(helper._is_calculus_related("I don't understand step 2", has_steps=True))
     
-    def test_get_response_not_configured(self):
-        """Test response when API key is not configured."""
-        # Mock environment to ensure no API key is found
-        with patch.dict('os.environ', {}, clear=True):
-            helper = LLMStepHelper(api_key=None)
-            
-            response = helper.get_response("What is a derivative?")
-            
-            self.assertIn("not configured", response.lower())
-            self.assertIn("groq", response.lower())
-    
     def test_get_response_non_calculus(self):
         """Test response for non-calculus questions."""
         response = self.helper.get_response("What's your favorite color?")
@@ -60,7 +49,6 @@ class TestLLMStepHelper(unittest.TestCase):
     @patch('chatbot.llm_chat.requests.post')
     def test_get_response_calculus_question(self, mock_post):
         """Test response for calculus questions."""
-        # Mock Groq response
         mock_response = MagicMock()
         mock_response.json.return_value = {
             "choices": [{"message": {"content": "This is a test response about calculus."}}]

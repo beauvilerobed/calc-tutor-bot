@@ -1,20 +1,22 @@
 # CaLaun Costs
 
-Last updated: 2026-05-04. Production reality, not theoretical pricing.
+Last updated: 2026-05-18. Production reality, not theoretical pricing.
 
 ## What it currently costs to run
 
-**Operational: $0/month.** Everything in production runs on free tiers.
+**Operational: ~$20/month** once the Hetzner migration is complete. Everything else is free-tier.
 
 | Service | What it does | Tier | Cost |
 |---------|--------------|------|------|
-| **Render** Web Service | Django app hosting | Free (sleeps 15min idle) | $0 |
+| **Render** Web Service | Django app hosting (until Hetzner cutover) | Free (sleeps 15min idle) | $0 |
 | **Neon** Postgres | Database (DATABASE_URL) | Free (0.5 GB, 100 CU-hr/mo) | $0 |
-| **Groq** API | LLM inference for chatbot | Free (~30 req/min) | $0 |
-| **Render TLS** | HTTPS for *.onrender.com + custom domain | Free (Let's Encrypt + Google Trust Services) | $0 |
+| **Hetzner Cloud CCX13** | Self-hosted Ollama running Qwen2.5-Math-7B | Paid VPS (~8 GB RAM) | ~$20/mo |
+| **Render TLS / Let's Encrypt** | HTTPS | Free | $0 |
 | **Cloudflare** CDN | Edge caching (via Render) | Free (passthrough) | $0 |
 
-**Cold-start trade-off:** the free Render instance sleeps after 15 min of no traffic. First request after sleep takes ~30 s. To remove cold starts, upgrade to Render Starter ($7/mo).
+> **Why we left Groq:** the Groq API key was burned and the linked organization was restricted (`organization_restricted`, HTTP 400 on every request). See [CHATBOT_HOSTING.html](CHATBOT_HOSTING.html) for the self-hosting plan we picked. Once the Hetzner box is the source of truth for everything (Django + Postgres + Ollama on one VPS), Render and Neon can both be decommissioned and the total becomes a flat ~$20/mo.
+
+**Cold-start trade-off:** the free Render instance sleeps after 15 min of no traffic. First request after sleep takes ~30 s. Self-hosting on the Hetzner VPS removes this entirely.
 
 ---
 
@@ -32,65 +34,22 @@ Last updated: 2026-05-04. Production reality, not theoretical pricing.
 
 | Daily users | Stack | Monthly cost |
 |-------------|-------|--------------|
-| 100 | Render free + Neon free + Groq free | **$0** |
-| 1,000 | Render Starter ($7) + Neon free + Groq free | **$7** |
-| 5,000 | Render Starter ($7) + Neon Launch ($19) + Groq free | **$26** |
-| 10,000+ | Render Starter ($7) + Neon Launch ($19) + Groq paid (~$10–20) | **$36–46** |
+| 100 | Single Hetzner CCX13 (Django + Postgres + Ollama) | **~$20** |
+| 1,000 | Same single-box setup; CCX13 still fits | **~$20** |
+| 5,000 | Hetzner CCX23 (16 GB) for headroom on Ollama | **~$35–45** |
+| 10,000+ | Hetzner CCX33 (32 GB) or split web/LLM onto two boxes | **~$60–90** |
 
 Scaling triggers:
-- **Render Starter ($7/mo)** removes cold starts. Worth it once you have any school partnership or grant.
-- **Neon Launch ($19/mo)** at >0.5 GB storage or >100 CU-hr/mo of compute.
-- **Groq paid** at >14.4K chatbot requests/day. Token-priced; even at high volume usually <$20/mo.
-
----
-
-## Non-profit formation costs (one-time, year 1)
-
-This is the path you're starting on — incorporate as a PA non-profit, file IRS Form 1023-EZ for 501(c)(3) status.
-
-| Item | Cost | Notes |
-|------|------|-------|
-| PA Articles of Incorporation (DSCB:15-5306) | $125 | Pennsylvania Department of State |
-| PA newspaper publication notice (15 Pa.C.S. § 1307) | $50–$300 | One general-circulation paper + one legal journal in your county |
-| PA charitable solicitation registration (BCO-10) | $15–$250 | Likely $15 in year 1 (revenue-tiered) |
-| Registered agent service | $50–$150/yr | E.g., Northwest Registered Agent |
-| IRS Form 1023-EZ filing fee | $275 | Approval typically 3–6 weeks |
-| EIN | $0 | Free, online, ~10 min |
-| Bylaws / COI policy / IP assignment templates | $0 | Free templates from councilofnonprofits.org |
-| **D&O insurance** (optional year 1) | $400–$800/yr | Highly recommended |
-| **Total year 1, no insurance** | **~$515–$990** | |
-| **Total year 1, with insurance** | **~$915–$1,790** | |
-
----
-
-## Recurring obligations after 501(c)(3) approval
-
-| Item | Cost | Frequency |
-|------|------|-----------|
-| IRS Form 990-N (e-postcard) | $0 | Annually by May 15 — **3 missed years = automatic loss of 501(c)(3)** |
-| PA Annual Report (under PA's 2025 Annual Report Act) | ~$7 | Annually |
-| PA charitable solicitation renewal | $15–$250 | Annually |
-| Domain renewal | ~$12 | Annually |
-| Private Email renewal | ~$15 | Annually |
-| Registered agent renewal | $50–$150 | Annually |
-| D&O insurance renewal | $400–$800 | Annually |
-| **Recurring total** (with insurance) | **~$500–$1,250** | per year |
-
----
-
-## Donations & grants — operating capital expectations
-
-After 501(c)(3) approval:
-- Tax-deductible donations via Stripe non-profit pricing (2.2% + $0.30/transaction)
-- Grant targets — see TODO.html § Phase 6 for the priority list and deadlines
-- Realistic year-2 funding goal: $5K–$25K from a mix of small individual donors + 1–3 small grants (state DOE, MAA Tensor-SUMMA, local family foundations)
+- **CCX23 (16 GB / ~$35–45/mo)** when Ollama starts swapping or response latency creeps past ~6 s.
+- **Postgres off-box** (Neon Launch $19/mo, or a managed Hetzner Postgres) when DB I/O starts contending with LLM CPU.
+- **Split web + LLM** onto two boxes when you need to scale either independently — adds ~$15–20/mo for a small web box.
 
 ---
 
 ## Recommended path
 
-1. **Now (free)**: keep operational stack as-is. $0/mo runs the live site.
-2. **Once 501(c)(3) approves**: upgrade Render to Starter ($7/mo) for no cold starts — schools and funders see a snappy site.
-3. **As traffic grows**: add Neon Launch ($19/mo) only when you actually hit storage or compute limits. Don't pre-pay.
+1. **Now**: finish the Hetzner CCX13 migration (~$20/mo) and decommission Render + Neon. Single-box hosting, no third-party LLM vendor.
+2. **As traffic grows**: bump to CCX23 (16 GB) only when Ollama latency or memory pressure warrants. Don't pre-pay.
+3. **If traffic justifies it**: split web and LLM onto separate boxes for independent scaling (+~$15–20/mo).
 
-Total realistic year-1 budget: **~$1,000–$2,000** (formation + ~6 months of paid Render Starter).
+Total realistic year-1 budget: **~$267** (Hetzner CCX13 ~$240/yr + domain & email ~$27/yr).

@@ -1,12 +1,14 @@
 """
 LLM Step Helper - An AI assistant that helps students understand calculus steps.
 
-Uses Groq's free API to run open-source LLMs (Llama 3, Mixtral, etc.) with
-extremely fast inference. Free tier includes 30 requests/minute.
+Talks to any OpenAI-compatible chat-completions endpoint. Defaults to a local
+Ollama server; in production we point this at the self-hosted Ollama on the
+Hetzner box via env vars.
 
-Setup:
-1. Get free API key: https://console.groq.com/keys
-2. Set environment variable: export GROQ_API_KEY="gsk_..."
+Env vars:
+  LLM_BASE_URL  e.g. http://localhost:11434/v1
+  LLM_API_KEY   bearer token (optional for local Ollama)
+  LLM_MODEL     e.g. qwen2.5:7b
 """
 
 import os
@@ -51,25 +53,18 @@ SCOPE:
 - Explain the general concept/rule, never the specific numerical result"""
 
 
-# Default settings - Groq is free and uses open-source models
-GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
-DEFAULT_MODEL = "llama-3.1-8b-instant"  # Fast, free, open-source
+DEFAULT_BASE_URL = "http://localhost:11434/v1"
+DEFAULT_MODEL = "qwen2.5:7b"
 
 
 class LLMStepHelper:
     """An LLM-based assistant that helps students understand calculus solution steps."""
-    
-    def __init__(self, api_key=None, model=None):
-        """
-        Initialize the LLM helper using Groq (free tier).
-        
-        Args:
-            api_key: Groq API key (defaults to GROQ_API_KEY env var)
-            model: Model to use (defaults to llama-3.1-8b-instant)
-        """
-        self.api_key = api_key or os.environ.get('GROQ_API_KEY')
-        self.model = model or os.environ.get('GROQ_MODEL', DEFAULT_MODEL)
-        self.api_url = GROQ_API_URL
+
+    def __init__(self, api_key=None, model=None, base_url=None):
+        self.api_key = api_key or os.environ.get('LLM_API_KEY', '')
+        self.model = model or os.environ.get('LLM_MODEL', DEFAULT_MODEL)
+        base = (base_url or os.environ.get('LLM_BASE_URL', DEFAULT_BASE_URL)).rstrip('/')
+        self.api_url = f"{base}/chat/completions"
         
         # Keywords for calculus topic detection
         self.calculus_keywords = {
@@ -82,10 +77,6 @@ class LLMStepHelper:
             'theorem', 'proof', 'dx', 'dy', 'sin(', 'cos(', 'tan(',
             'log(', 'ln(', 'exp(',
         }
-    
-    def _is_configured(self):
-        """Check if the API key is configured."""
-        return bool(self.api_key)
     
     def _is_calculus_related(self, message, has_steps=False):
         """
@@ -171,16 +162,7 @@ class LLMStepHelper:
             The assistant's response text
         """
         has_steps = bool(steps_html)
-        
-        # Check if API key is configured
-        if not self._is_configured():
-            return (
-                "The AI assistant is not configured. To enable it:\n\n"
-                "1. Get a free API key at https://console.groq.com/keys\n"
-                "2. Set: export GROQ_API_KEY=\"your-key\"\n"
-                "3. Restart the server"
-            )
-        
+
         # Check if the question is calculus-related
         if not self._is_calculus_related(message, has_steps):
             return (
@@ -213,13 +195,14 @@ class LLMStepHelper:
         # Add the current message
         messages.append({"role": "user", "content": message})
         
+        headers = {"Content-Type": "application/json"}
+        if self.api_key:
+            headers["Authorization"] = f"Bearer {self.api_key}"
+
         try:
             response = requests.post(
                 self.api_url,
-                headers={
-                    "Authorization": f"Bearer {self.api_key}",
-                    "Content-Type": "application/json"
-                },
+                headers=headers,
                 json={
                     "model": self.model,
                     "messages": messages,
@@ -234,7 +217,7 @@ class LLMStepHelper:
         except requests.exceptions.Timeout:
             return "The response is taking too long. Please try again."
         except requests.exceptions.RequestException as e:
-            print(f"Groq API error: {e}")
+            print(f"LLM API error: {e}")
             return (
                 "I'm having trouble connecting right now. "
                 "Please try again in a moment."

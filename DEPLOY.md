@@ -49,13 +49,15 @@ Copy the output for the next step.
    | `ALLOWED_HOSTS` | `your-app-name.onrender.com` |
    | `CSRF_TRUSTED_ORIGINS` | `https://your-app-name.onrender.com` |
    | `DATABASE_URL` | (paste from Step 1) |
-   | `GROQ_API_KEY` | (free key from https://console.groq.com/keys) |
+   | `LLM_BASE_URL` | URL of your self-hosted LLM (e.g. `https://llm.calaun.org/v1`) — see [CHATBOT_HOSTING.html](CHATBOT_HOSTING.html) |
+   | `LLM_API_KEY` | Bearer token for the LLM (required when exposing Ollama publicly) |
+   | `LLM_MODEL` | Model name (e.g. `qwen2.5:7b`) |
    | `LOG_LEVEL` | `INFO` |
 
 5. Click **Create Web Service**. First deploy takes ~3–5 min.
 6. Visit `https://your-app-name.onrender.com` — you're live.
 
-> **Cold start note:** the free instance sleeps after 15 minutes of inactivity and takes ~30 s to wake up on the next request. For a non-profit teaching tool that's typically fine; if you want it always-on, Render's Starter ($7/mo) or self-hosting on a small VPS removes the sleep.
+> **Cold start note:** the free instance sleeps after 15 minutes of inactivity and takes ~30 s to wake up on the next request. For a free teaching tool that's typically fine; if you want it always-on, Render's Starter ($7/mo) or self-hosting on a small VPS removes the sleep.
 
 ## Step 4 — (Optional) Add a custom domain
 
@@ -224,7 +226,9 @@ createdb calaun
 | `ALLOWED_HOSTS` | prod | `127.0.0.1,localhost` | Comma-separated hosts. |
 | `CSRF_TRUSTED_ORIGINS` | prod | empty | Comma-separated, **with scheme**: `https://example.com`. Required for HTTPS POSTs. |
 | `DATABASE_URL` | prod | unset (SQLite) | Full Postgres URL. |
-| `GROQ_API_KEY` | optional | unset | Enables the chatbot. |
+| `LLM_BASE_URL` | optional | `http://localhost:11434/v1` | OpenAI-compatible chat-completions base URL. Defaults to local Ollama. |
+| `LLM_API_KEY` | optional | unset | Bearer token for the LLM endpoint. Optional for local Ollama; required when exposing publicly. |
+| `LLM_MODEL` | optional | `qwen2.5:7b` | Model name to send to the endpoint. |
 | `SECURE_SSL_REDIRECT` | optional | `True` | Honored only when `DEBUG=False`. |
 | `SECURE_HSTS_SECONDS` | optional | `31536000` | HSTS duration. |
 | `LOG_LEVEL` | optional | `INFO` | Standard logging levels. |
@@ -242,7 +246,9 @@ docker run -p 8000:8000 \
   -e DEBUG=False \
   -e ALLOWED_HOSTS=localhost \
   -e DATABASE_URL=postgres://... \
-  -e GROQ_API_KEY=gsk_... \
+  -e LLM_BASE_URL=https://llm.example.com/v1 \
+  -e LLM_API_KEY=... \
+  -e LLM_MODEL=qwen2.5:7b \
   calaun
 ```
 
@@ -265,7 +271,8 @@ DEBUG=False
 ALLOWED_HOSTS=yourdomain.com
 CSRF_TRUSTED_ORIGINS=https://yourdomain.com
 DATABASE_URL=postgres://user:pass@localhost:5432/calaun
-GROQ_API_KEY=gsk_...
+LLM_BASE_URL=http://localhost:11434/v1
+LLM_MODEL=qwen2.5:7b
 EOF
 
 python manage.py collectstatic --noinput

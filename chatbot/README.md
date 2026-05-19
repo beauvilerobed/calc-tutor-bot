@@ -1,11 +1,10 @@
 # Math Step Helper Chatbot
 
-An AI-powered chatbot that helps students understand calculus solution steps. Uses **Groq's free API** to run open-source LLMs (Llama 3.1) with extremely fast inference.
+An AI-powered chatbot that helps students understand calculus solution steps. Talks to any OpenAI-compatible chat-completions endpoint; production runs a self-hosted Ollama with Qwen2.5-Math-7B.
 
 ## Features
 
-- **Free Tier**: 30 requests/minute, no credit card needed
-- **Open Source Models**: Llama 3.1, Mixtral, Gemma
+- **Self-hosted**: no third-party LLM vendor dependency
 - **Step-aware**: Receives the current solution steps as context
 - **Calculus-focused**: Only answers calculus-related questions
 - **Teaching-focused**: Explains concepts without giving direct answers
@@ -14,25 +13,30 @@ An AI-powered chatbot that helps students understand calculus solution steps. Us
 
 ## Setup
 
-1. **Get a free API key** at https://console.groq.com/keys
+1. **Install Ollama** from https://ollama.com (one-line installer for macOS / Linux).
 
-2. **Create a `.env` file** in the project root:
+2. **Pull a model**:
+   ```bash
+   ollama pull qwen2.5:7b
    ```
-   GROQ_API_KEY=gsk_your_key_here
-   ```
 
-3. **Restart the server**
+3. **Start the server** — the defaults already point at local Ollama (`http://localhost:11434/v1`), so no env vars are needed for local dev.
 
-Optional environment variables:
-- `GROQ_MODEL` - Model to use (default: `llama-3.1-8b-instant`)
+Environment variables (override defaults as needed):
+- `LLM_BASE_URL` - OpenAI-compatible base URL (default: `http://localhost:11434/v1`)
+- `LLM_API_KEY` - Bearer token (optional for local Ollama; required if exposing publicly)
+- `LLM_MODEL` - Model name (default: `qwen2.5:7b`)
 
-## Supported Models
+## Supported models
 
-All free on Groq:
-- `llama-3.1-8b-instant` - Fast, good for most questions (default)
-- `llama-3.3-70b-versatile` - More capable, slightly slower  
-- `mixtral-8x7b-32768` - Great reasoning ability
-- `gemma2-9b-it` - Good balance of speed and quality
+Anything Ollama can run. For a calculus tutor:
+- `qwen2.5:7b` - Good general default (~10–12 GB RAM)
+- `qwen2.5-math:7b` - Math-specialized, best for this use case
+- `qwen2.5-math:1.5b` - Tiny math-specialized model (~3 GB RAM)
+- `phi3:mini` - Microsoft Phi-3-mini, good general reasoning
+- `llama3.1:8b` - Meta Llama 3.1 8B
+
+See [CHATBOT_HOSTING.html](../CHATBOT_HOSTING.html) for the full self-hosting plan and tradeoffs.
 
 ## Usage
 
@@ -56,7 +60,7 @@ answer = llm_response("Can you give an example?", conversation_history=history)
 The chatbot is designed to be a helpful tutor, not a calculator:
 
 1. **Receives context**: Gets the current solution steps being displayed
-2. **Understands the question**: Uses Llama 3.1 to understand what the student is asking
+2. **Understands the question**: Uses the configured LLM to understand what the student is asking
 3. **Explains concepts**: Provides explanations of rules and techniques
 4. **Never calculates**: Won't solve problems directly - encourages learning
 
@@ -85,4 +89,4 @@ The chatbot is designed to be a helpful tutor, not a calculator:
 
 ## Files
 
-- `llm_chat.py` - LLM chatbot using Groq API
+- `llm_chat.py` - LLM chatbot client (OpenAI-compatible; defaults to local Ollama)
