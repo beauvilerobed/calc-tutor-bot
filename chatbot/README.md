@@ -1,6 +1,6 @@
 # Math Step Helper Chatbot
 
-An AI-powered chatbot that helps students understand calculus solution steps. Talks to any OpenAI-compatible chat-completions endpoint; production runs a self-hosted Ollama with Qwen2.5-Math-7B.
+An AI-powered chatbot that helps students understand calculus solution steps. Talks to any OpenAI-compatible chat-completions endpoint; production runs a self-hosted Ollama with Qwen2.5-Math-1.5B.
 
 ## Features
 
@@ -36,7 +36,17 @@ Anything Ollama can run. For a calculus tutor:
 - `phi3:mini` - Microsoft Phi-3-mini, good general reasoning
 - `llama3.1:8b` - Meta Llama 3.1 8B
 
-See [CHATBOT_HOSTING.html](../CHATBOT_HOSTING.html) for the full self-hosting plan and tradeoffs.
+Production runs `qwen2.5:7b` on a single Hetzner Cloud CCX13 VPS (~8 GB RAM, ~$20/month). The chatbot and Django share the same box and talk over `localhost:11434`.
+
+## Production architecture
+
+| Component | Where it runs |
+| --- | --- |
+| Django (gunicorn) | Hetzner CCX13, behind reverse proxy w/ TLS |
+| PostgreSQL | Same Hetzner CCX13 (loopback) |
+| Ollama + Qwen2.5-Math-1.5B | Same Hetzner CCX13, listening on `localhost:11434` |
+
+No third-party LLM API in the critical path. No per-token billing meter. If the box dies, everything dies together — restore is restoring one VPS.
 
 ## Usage
 
