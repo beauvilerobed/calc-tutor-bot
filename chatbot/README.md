@@ -36,7 +36,7 @@ Anything Ollama can run. For a calculus tutor:
 - `phi3:mini` - Microsoft Phi-3-mini, good general reasoning
 - `llama3.1:8b` - Meta Llama 3.1 8B
 
-Production runs `qwen2.5:7b` on a single Hetzner Cloud CCX13 VPS (~8 GB RAM, ~$20/month). The chatbot and Django share the same box and talk over `localhost:11434`.
+Production runs `qwen2.5:1.5b` on a Hetzner Cloud CCX13 VPS (~8 GB RAM, ~$20/month).
 
 ## Production architecture
 
