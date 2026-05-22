@@ -100,9 +100,7 @@ python -m pytest chatbot/    # Run chatbot tests only
 
 ## Production deployment
 
-The live site at [calaun.org](https://calaun.org) runs on a single Hetzner Cloud CCX13 VPS (~$20/month) hosting Django, PostgreSQL, and Ollama (running Qwen2.5-Math-1.5B) all on the same box. Django talks to Ollama over `localhost:11434`. See [DEPLOY.md](DEPLOY.md) for the deployment guide.
-
-Required env vars in production: `SECRET_KEY`, `DEBUG=False`, `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS`, `DATABASE_URL`, `LLM_BASE_URL` (typically `http://localhost:11434/v1`), `LLM_MODEL` (typically `qwen2.5:1.5b`).
+The live site at [calaun.org](https://calaun.org) runs on Hetzner Cloud VPS hosting Django, PostgreSQL, and Ollama (running Qwen2.5-Math-1.5B).
 
 ## Project Structure
 
