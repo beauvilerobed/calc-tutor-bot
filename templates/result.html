@@ -65,5 +65,6 @@
 <script>
     window.CHATBOT_URL = '{% url "chatbot" %}';
     window.USE_LLM_CHATBOT = true;
+    window.PROBLEM_INPUT = '{{ input|escapejs }}';
 </script>
 {% endblock %}
