@@ -207,15 +207,16 @@ class LLMChatBotApiView(View):
         input_data = json.loads(request.body.decode('utf-8'))
         msg = input_data.get('text', '')
         steps_html = input_data.get('steps', '')
+        problem = input_data.get('problem', '')
         history = input_data.get('history', [])
-        
+
         # Log the request
         analytics.log_chatbot_request(
             ip_address=ip,
             was_calculus_related=True,  # Will be determined by llm_chat
             had_steps_context=bool(steps_html)
         )
-        
+
         # Emergency kill switch: set CHATBOT_ENABLED=False in the env to
         # short-circuit the LLM call and return a graceful disclaimer.
         if os.environ.get('CHATBOT_ENABLED', 'True').strip().lower() == 'false':
@@ -224,7 +225,10 @@ class LLMChatBotApiView(View):
                 "Please enjoy the step-by-step solution above!"
             )
         else:
-            response = llm_response(msg, steps_html=steps_html, conversation_history=history)
+            response = llm_response(
+                msg, steps_html=steps_html, problem=problem,
+                conversation_history=history,
+            )
 
         result = JsonResponse({
             'text': response

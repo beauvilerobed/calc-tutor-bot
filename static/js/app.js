@@ -247,6 +247,7 @@ class ChatBot {
 
             if (this.useLLM) {
                 body.steps = this.getStepsContext();
+                body.problem = window.PROBLEM_INPUT || '';
                 body.history = this.conversationHistory.slice(0, -1); // Exclude current message
             }
 
