@@ -5,129 +5,117 @@ Tracks:
 - Chatbot requests (per IP, timestamp, calculus-related or not)
 - Solver requests (expression type: derivative, integral, limit)
 - Rate limiting state
+
+Request logs are persisted to the database so stats are consistent across
+multiple workers and survive process restarts. Rate limiting stays in-memory
+per worker — that's fine because the limit is conservative and per-IP.
 """
 
 import time
 import logging
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import timedelta
+
+from django.db.models import Count
+from django.utils import timezone
 
 logger = logging.getLogger('calaun')
 
 
 class Analytics:
-    """Simple in-memory analytics tracker.
-    
-    For production with multiple workers, replace with Redis or database.
-    """
-    
+    """DB-backed analytics tracker with in-memory rate limiting."""
+
     def __init__(self):
-        self.chatbot_requests = []
-        self.solver_requests = []
         self._rate_limits = defaultdict(list)  # IP -> list of timestamps
-        
-    def log_chatbot_request(self, ip_address, was_calculus_related=True, 
+
+    def log_chatbot_request(self, ip_address, was_calculus_related=True,
                             had_steps_context=False):
-        """Log a chatbot API request."""
-        entry = {
-            'timestamp': datetime.now().isoformat(),
-            'ip': ip_address,
-            'calculus_related': was_calculus_related,
-            'had_steps': had_steps_context,
-        }
-        self.chatbot_requests.append(entry)
-        
-        # Keep only last 10000 entries in memory
-        if len(self.chatbot_requests) > 10000:
-            self.chatbot_requests = self.chatbot_requests[-5000:]
-        
+        """Persist a chatbot API request."""
+        from app.models import ChatbotRequest
+        ChatbotRequest.objects.create(
+            ip=ip_address,
+            calculus_related=was_calculus_related,
+            had_steps=had_steps_context,
+        )
         logger.info(f"Chatbot request from {ip_address[:12]}... "
                    f"(calculus={was_calculus_related}, steps={had_steps_context})")
-    
+
     def log_solver_request(self, ip_address, expression_type):
-        """Log a solver request (derivative, integral, limit, other)."""
-        entry = {
-            'timestamp': datetime.now().isoformat(),
-            'ip': ip_address,
-            'type': expression_type,
-        }
-        self.solver_requests.append(entry)
-        
-        # Keep only last 10000 entries
-        if len(self.solver_requests) > 10000:
-            self.solver_requests = self.solver_requests[-5000:]
-        
+        """Persist a solver request (derivative, integral, limit, other)."""
+        from app.models import SolverRequest
+        SolverRequest.objects.create(
+            ip=ip_address,
+            expression_type=expression_type,
+        )
         logger.info(f"Solver request from {ip_address[:12]}... ({expression_type})")
-    
+
     def check_rate_limit(self, ip_address, max_requests=10, window_seconds=60):
         """
         Check if IP is rate limited.
-        
+
         Default: 10 requests per minute per IP for chatbot.
         This is conservative to ensure fair access for all users.
-        
+
         Returns:
             tuple: (is_allowed, requests_remaining, retry_after_seconds)
         """
         now = time.time()
         window_start = now - window_seconds
-        
-        # Clean old entries
+
         self._rate_limits[ip_address] = [
-            ts for ts in self._rate_limits[ip_address] 
+            ts for ts in self._rate_limits[ip_address]
             if ts > window_start
         ]
-        
+
         current_count = len(self._rate_limits[ip_address])
-        
+
         if current_count >= max_requests:
-            # Find when the oldest request will expire
             oldest = min(self._rate_limits[ip_address])
             retry_after = int(oldest + window_seconds - now) + 1
             return False, 0, retry_after
-        
-        # Add this request
+
         self._rate_limits[ip_address].append(now)
         remaining = max_requests - current_count - 1
-        
+
         return True, remaining, 0
-    
+
     def get_stats(self, hours=24):
         """Get usage statistics for the last N hours."""
-        cutoff = datetime.now() - timedelta(hours=hours)
-        cutoff_str = cutoff.isoformat()
-        
-        recent_chatbot = [r for r in self.chatbot_requests 
-                         if r['timestamp'] > cutoff_str]
-        recent_solver = [r for r in self.solver_requests 
-                        if r['timestamp'] > cutoff_str]
-        
-        # Count by type
-        solver_by_type = defaultdict(int)
-        for r in recent_solver:
-            solver_by_type[r['type']] += 1
-        
-        # Unique IPs
-        chatbot_ips = set(r['ip'] for r in recent_chatbot)
-        solver_ips = set(r['ip'] for r in recent_solver)
-        
+        from app.models import ChatbotRequest, SolverRequest
+
+        cutoff = timezone.now() - timedelta(hours=hours)
+
+        chatbot_qs = ChatbotRequest.objects.filter(timestamp__gt=cutoff)
+        solver_qs = SolverRequest.objects.filter(timestamp__gt=cutoff)
+
+        chatbot_total = chatbot_qs.count()
+        chatbot_unique = chatbot_qs.values('ip').distinct().count()
+        chatbot_calc = chatbot_qs.filter(calculus_related=True).count()
+        chatbot_steps = chatbot_qs.filter(had_steps=True).count()
+
+        solver_total = solver_qs.count()
+        solver_unique = solver_qs.values('ip').distinct().count()
+        solver_by_type = {
+            row['expression_type']: row['n']
+            for row in solver_qs.values('expression_type').annotate(n=Count('id'))
+        }
+
         return {
             'period_hours': hours,
             'chatbot': {
-                'total_requests': len(recent_chatbot),
-                'unique_users': len(chatbot_ips),
-                'calculus_related': sum(1 for r in recent_chatbot if r['calculus_related']),
-                'with_steps_context': sum(1 for r in recent_chatbot if r['had_steps']),
+                'total_requests': chatbot_total,
+                'unique_users': chatbot_unique,
+                'calculus_related': chatbot_calc,
+                'with_steps_context': chatbot_steps,
             },
             'solver': {
-                'total_requests': len(recent_solver),
-                'unique_users': len(solver_ips),
-                'by_type': dict(solver_by_type),
+                'total_requests': solver_total,
+                'unique_users': solver_unique,
+                'by_type': solver_by_type,
             }
         }
 
 
-# Global analytics instance
 _analytics = None
 
 
