@@ -1,6 +1,6 @@
 # CaLaun
 
-A free, open-source Django calculus tutor that shows step-by-step solutions for derivatives, integrals, and limits. Includes an AI chatbot powered by a self-hosted open-weight LLM (Qwen2.5-Math-1.5B via Ollama).
+A free, open-source Django calculus tutor that shows step-by-step solutions for derivatives, integrals, and limits. Includes an AI chatbot powered by a self-hosted open-weight LLM (Llama 3.2 3B via Ollama).
 
 **Live:** [https://calaun.org](https://calaun.org) · **License:** MIT · **Status:** personal open-source project (not a non-profit;)
 
@@ -9,7 +9,7 @@ A free, open-source Django calculus tutor that shows step-by-step solutions for 
 ## Features
 
 - **Step-by-step solutions** for derivatives, integrals, and limits
-- **AI chatbot sidebar** that explains calculus concepts (powered by Qwen2.5-Math via self-hosted Ollama)
+- **AI chatbot sidebar** that explains calculus concepts (powered by self-hosted Ollama; streams per-step answers progressively)
 - **Reference page** with common formulas and "try it" links
 
 ## Screenshots
@@ -42,9 +42,10 @@ The results page shows step-by-step solutions with an AI chatbot sidebar:
 3. **Set up the AI chatbot (optional but recommended):**
    ```bash
    # Install Ollama from https://ollama.com, then:
-   ollama pull qwen2.5:1.5B
-   # The defaults (LLM_BASE_URL=http://localhost:11434/v1, LLM_MODEL=qwen2.5:1.5B)
-   # already point at a local Ollama, so no env vars needed for local dev.
+   ollama pull llama3.2:3b
+   # Set LLM_MODEL=llama3.2:3b in your .env (or whichever model you pulled).
+   # LLM_BASE_URL defaults to http://localhost:11434/v1, so no other env vars
+   # are needed for local dev.
    ```
 
 4. **Run the development server:**
@@ -75,12 +76,13 @@ Enter calculus expressions like:
 
 ## AI Chatbot
 
-The chatbot talks to any OpenAI-compatible chat-completions endpoint via env vars (`LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`). Production runs Qwen2.5-Math-1.5B on self-hosted Ollama. It:
+The chatbot talks to any OpenAI-compatible chat-completions endpoint via env vars (`LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`). Production runs an open-weight model on self-hosted Ollama (currently Llama 3.2 3B). It:
 - Explains calculus concepts and rules
 - Understands the current solution steps as context
+- **Streams per-step answers**: when the student asks about multiple steps in one message, each step's answer reaches the browser as soon as it's generated, instead of waiting for all of them
 - Uses proper LaTeX formatting in responses
 
-See [chatbot/README.md](chatbot/README.md) for more details.
+See [chatbot/README.md](chatbot/README.md) for routing details and HTTP API shape.
 
 ## Testing
 
@@ -94,13 +96,17 @@ python -m pytest chatbot/    # Run chatbot tests only
 
 - **Backend:** Django 4.2
 - **Math Engine:** SymPy
-- **AI Chatbot:** Ollama + Qwen2.5-Math-1.5B (self-hosted, OpenAI-compatible API)
+- **AI Chatbot:** Ollama + Llama 3.2 3B (self-hosted, OpenAI-compatible API; NDJSON streaming response)
 - **Frontend:** Vanilla ES6 JavaScript, MathJax 3, CSS custom properties
 - **Database:** SQLite (dev) / PostgreSQL (prod via DATABASE_URL)
 
 ## Production deployment
 
-The live site at [calaun.org](https://calaun.org) runs on Hetzner Cloud VPS hosting Django, PostgreSQL, and Ollama (running Qwen2.5-Math-1.5B).
+The live site at [calaun.org](https://calaun.org) runs on a single Hetzner Cloud CCX13 VPS (~$20/month) hosting Django, PostgreSQL, and Ollama all on the same box. Django talks to Ollama over `localhost:11434`. See [DEPLOY.md](DEPLOY.md) for the deployment guide.
+
+The chatbot endpoint streams NDJSON, so nginx must pass response chunks through immediately. The Django view sets `X-Accel-Buffering: no` on every chatbot response — no nginx config change required.
+
+Required env vars in production: `SECRET_KEY`, `DEBUG=False`, `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS`, `DATABASE_URL`, `LLM_BASE_URL` (typically `http://localhost:11434/v1`), `LLM_MODEL` (e.g. `llama3.2:3b`).
 
 ## Project Structure
 
