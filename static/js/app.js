@@ -257,14 +257,65 @@ class ChatBot {
                 body: JSON.stringify(body)
             });
 
-            clearInterval(statusTimer);
-            typingIndicator.remove();
+            // Rate limit or other non-streaming JSON error responses.
+            if (!response.ok) {
+                clearInterval(statusTimer);
+                typingIndicator.remove();
+                try {
+                    const errData = await response.json();
+                    this.addMessage(errData.text || 'Sorry, something went wrong.');
+                } catch {
+                    this.addMessage('Sorry, something went wrong. Please try again.');
+                }
+                return;
+            }
 
-            if (!response.ok) throw new Error('Network error');
+            // Stream NDJSON events from the server. Each event is one JSON
+            // object per line: {type:"step",step:N,text:"..."} or
+            // {type:"answer",text:"..."}.
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+            let renderedAny = false;
 
-            const data = await response.json();
-            const responseText = Array.isArray(data.text) ? data.text[0] : data.text;
-            this.addMessage(responseText || 'Sorry, I didn\'t understand that.');
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) break;
+                buffer += decoder.decode(value, { stream: true });
+
+                let newlineIdx;
+                while ((newlineIdx = buffer.indexOf('\n')) >= 0) {
+                    const line = buffer.slice(0, newlineIdx).trim();
+                    buffer = buffer.slice(newlineIdx + 1);
+                    if (!line) continue;
+
+                    let event;
+                    try { event = JSON.parse(line); }
+                    catch { continue; }
+
+                    if (event.type === 'done') continue;
+
+                    // First chunk arrived — drop the typing indicator.
+                    if (!renderedAny) {
+                        clearInterval(statusTimer);
+                        typingIndicator.remove();
+                        renderedAny = true;
+                    }
+
+                    if (event.type === 'step') {
+                        this.addMessage(`**Step ${event.step}**\n\n${event.text || ''}`);
+                    } else if (event.type === 'answer') {
+                        this.addMessage(event.text || '');
+                    }
+                }
+            }
+
+            // No events came through at all (shouldn't happen, but be safe).
+            if (!renderedAny) {
+                clearInterval(statusTimer);
+                typingIndicator.remove();
+                this.addMessage('Sorry, I didn\'t understand that.');
+            }
         } catch (err) {
             clearInterval(statusTimer);
             typingIndicator.remove();

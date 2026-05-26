@@ -22,95 +22,70 @@ class ApiTestCase(TestCase):
     """
     Tests to make sure that the chatBot app is
     properly working with the Django app.
+
+    The chatbot endpoint streams NDJSON (one JSON event per line). Each test
+    drains the stream and asserts at least one event carries non-empty text.
     """
 
     def setUp(self):
         super().setUp()
         self.api_url = reverse('chatbot')
 
+    def _parse_ndjson(self, response):
+        body = b''.join(response.streaming_content).decode('utf-8')
+        return [json.loads(line) for line in body.splitlines() if line.strip()]
+
+    def _assert_streamed_text(self, response):
+        self.assertEqual(response.status_code, 200)
+        events = self._parse_ndjson(response)
+        text_events = [e for e in events if e.get('type') in ('answer', 'step')]
+        self.assertTrue(text_events, 'expected at least one text-bearing event')
+        self.assertTrue(all(e.get('text') for e in text_events))
+        self.assertEqual(events[-1].get('type'), 'done')
+
     def test_post(self):
-        """
-        Test that a response is returned.
-        """
-        data = {
-            'text': 'How are you?'
-        }
         response = self.client.post(
             self.api_url,
-            data=json.dumps(data),
+            data=json.dumps({'text': 'How are you?'}),
             content_type='application/json',
-            format='json'
         )
-
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('text', response.json())
+        self._assert_streamed_text(response)
 
     def test_other_post(self):
-        """
-        Test that a response is returned.
-        """
         response = self.client.post(
             self.api_url,
-            data=json.dumps({
-                'text': 'Im stuck'
-            }),
+            data=json.dumps({'text': 'Im stuck'}),
             content_type='application/json',
-            format='json'
         )
-
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('text', response.json())
-        self.assertTrue(len(response.json()['text']) > 0)
+        self._assert_streamed_text(response)
 
     def test_post_unicode(self):
-        """
-        Test that a response is returned.
-        """
         response = self.client.post(
             self.api_url,
-            data=json.dumps({
-                'text': u'سلام'
-            }),
+            data=json.dumps({'text': u'سلام'}),
             content_type='application/json',
-            format='json'
         )
-
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('text', response.json())
-        self.assertTrue(len(response.json()['text']) > 0)
+        self._assert_streamed_text(response)
 
     def test_escaped_unicode_post(self):
-        """
-        Test that unicode reponce
-        """
         response = self.client.post(
             self.api_url,
-            data=json.dumps({
-                'text': '\u2013'
-            }),
+            data=json.dumps({'text': '–'}),
             content_type='application/json',
-            format=json
         )
-
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('text', response.json())
+        self._assert_streamed_text(response)
 
     def test_post_tags(self):
         post_data = {
             'text': 'Good morning.',
-            'tags': [
-                'user:jen@example.com'
-            ]
+            'tags': ['user:jen@example.com'],
         }
         response = self.client.post(
             self.api_url,
             data=json.dumps(post_data),
             content_type='application/json',
-            format='json'
         )
-
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('text', response.json())
+        self._assert_streamed_text(response)
 
     def test_get(self):
         response = self.client.get(self.api_url)

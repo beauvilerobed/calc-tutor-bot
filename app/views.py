@@ -1,10 +1,10 @@
-from django.http import HttpResponse, JsonResponse, Http404
+from django.http import HttpResponse, JsonResponse, Http404, StreamingHttpResponse
 from django.shortcuts import render
 from django import forms
 from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from chatbot.llm_chat import llm_response
+from chatbot.llm_chat import llm_response, llm_response_stream
 from logic.logic import UserInput
 from mathtutor import settings
 from app.analytics import get_analytics, get_client_ip
@@ -220,24 +220,36 @@ class LLMChatBotApiView(View):
         # Emergency kill switch: set CHATBOT_ENABLED=False in the env to
         # short-circuit the LLM call and return a graceful disclaimer.
         if os.environ.get('CHATBOT_ENABLED', 'True').strip().lower() == 'false':
-            response = (
-                "Calaun is currently unavailable. "
-                "Please enjoy the step-by-step solution above!"
-            )
+            def disabled_stream():
+                yield json.dumps({
+                    'type': 'answer',
+                    'text': (
+                        "Calaun is currently unavailable. "
+                        "Please enjoy the step-by-step solution above!"
+                    ),
+                }) + '\n'
+                yield json.dumps({'type': 'done'}) + '\n'
+            event_iter = disabled_stream()
         else:
-            response = llm_response(
-                msg, steps_html=steps_html, problem=problem,
-                conversation_history=history,
-            )
+            def event_stream():
+                for event in llm_response_stream(
+                    msg, steps_html=steps_html, problem=problem,
+                    conversation_history=history,
+                ):
+                    yield json.dumps(event) + '\n'
+            event_iter = event_stream()
 
-        result = JsonResponse({
-            'text': response
-        }, status=200)
-        
-        # Add rate limit headers
+        result = StreamingHttpResponse(
+            event_iter,
+            content_type='application/x-ndjson',
+            status=200,
+        )
+        # Disable nginx response buffering so each step reaches the browser
+        # as soon as it's ready.
+        result['X-Accel-Buffering'] = 'no'
+        result['Cache-Control'] = 'no-cache'
         result['X-RateLimit-Remaining'] = remaining
         result['X-RateLimit-Limit'] = 10
-        
         return result
 
 
