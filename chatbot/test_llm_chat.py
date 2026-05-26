@@ -3,7 +3,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
 from chatbot.llm_chat import (
-    LLMStepHelper, llm_response,
+    LLMStepHelper, llm_response, llm_response_stream,
     _referenced_step_numbers, _extract_step_blocks,
 )
 
@@ -173,7 +173,8 @@ class TestLLMStepHelper(unittest.TestCase):
             problem="diff(x^5, x)",
         )
 
-        self.assertEqual(response, "Step 2 explanation.")
+        self.assertIn("Step 2 explanation.", response)
+        self.assertIn("**Step 2**", response)
         self.assertEqual(mock_post.call_count, 1)
 
         sent = mock_post.call_args.kwargs['json']['messages']
@@ -299,6 +300,147 @@ class TestLLMResponseFunction(unittest.TestCase):
             None,
         )
         self.assertEqual(response, "Test response")
+
+
+class TestStreamingResponse(unittest.TestCase):
+    """Tests for the streaming response API.
+
+    The streaming API yields one event per step (or a single answer event for
+    non-step questions), then a terminating 'done' event. Each step event is
+    emitted as its own LLM call finishes, so the frontend can render
+    progressively instead of waiting for all steps.
+    """
+
+    def setUp(self):
+        self.helper = LLMStepHelper(api_key='test-key')
+
+    def test_stream_non_calculus_yields_redirect(self):
+        events = list(self.helper.get_response_stream("What's the weather?"))
+        self.assertEqual(events[-1], {'type': 'done'})
+        self.assertEqual(events[0]['type'], 'answer')
+        self.assertIn('calculus', events[0]['text'].lower())
+
+    @patch('chatbot.llm_chat.requests.post')
+    def test_stream_no_step_reference_yields_single_answer(self, mock_post):
+        mock_response = MagicMock()
+        mock_response.json.return_value = {
+            "choices": [{"message": {"content": "Chain rule answer."}}]
+        }
+        mock_response.raise_for_status = MagicMock()
+        mock_post.return_value = mock_response
+
+        events = list(self.helper.get_response_stream("What is the chain rule?"))
+
+        self.assertEqual(len(events), 2)
+        self.assertEqual(events[0], {'type': 'answer', 'text': 'Chain rule answer.'})
+        self.assertEqual(events[1], {'type': 'done'})
+
+    @patch('chatbot.llm_chat.requests.post')
+    def test_stream_multiple_steps_yields_one_event_per_step(self, mock_post):
+        """Each step's answer is yielded as that step's LLM call finishes."""
+        mock_response = MagicMock()
+        mock_response.json.side_effect = [
+            {"choices": [{"message": {"content": "Step 1 answer."}}]},
+            {"choices": [{"message": {"content": "Step 3 answer."}}]},
+        ]
+        mock_response.raise_for_status = MagicMock()
+        mock_post.return_value = mock_response
+
+        events = list(self.helper.get_response_stream(
+            "Walk me through step 1 and step 3",
+            steps_html=SAMPLE_STEPS_HTML,
+            problem="diff(x^5, x)",
+        ))
+
+        step_events = [e for e in events if e['type'] == 'step']
+        self.assertEqual(len(step_events), 2)
+        self.assertEqual(step_events[0], {'type': 'step', 'step': 1, 'text': 'Step 1 answer.'})
+        self.assertEqual(step_events[1], {'type': 'step', 'step': 3, 'text': 'Step 3 answer.'})
+        self.assertEqual(events[-1], {'type': 'done'})
+
+    @patch('chatbot.llm_chat.requests.post')
+    def test_multi_step_scoping_drops_history_and_rewrites_message(self, mock_post):
+        """Per-step calls must NOT include conversation history and must use a
+        question scoped to that single step."""
+        mock_response = MagicMock()
+        mock_response.json.return_value = {
+            "choices": [{"message": {"content": "ok"}}]
+        }
+        mock_response.raise_for_status = MagicMock()
+        mock_post.return_value = mock_response
+
+        history = [
+            {"role": "user", "content": "earlier question"},
+            {"role": "assistant", "content": "earlier answer"},
+        ]
+
+        list(self.helper.get_response_stream(
+            "how did you get step 1 and step 3?",
+            steps_html=SAMPLE_STEPS_HTML,
+            problem="diff(x^5, x)",
+            conversation_history=history,
+        ))
+
+        for call in mock_post.call_args_list:
+            messages = call.kwargs['json']['messages']
+            # History assistant messages must not leak into per-step calls.
+            roles_contents = [(m['role'], m['content']) for m in messages]
+            self.assertNotIn(('assistant', 'earlier answer'), roles_contents)
+            self.assertNotIn(('user', 'earlier question'), roles_contents)
+            # The user-facing message should be the scoped rewrite, not the
+            # original "step 1 and step 3" wording verbatim as the question.
+            user_msgs = [m['content'] for m in messages if m['role'] == 'user']
+            self.assertEqual(len(user_msgs), 1)
+            self.assertIn('Step', user_msgs[0])  # scoped to a specific step
+            self.assertIn('ONLY', user_msgs[0])
+
+    @patch('chatbot.llm_chat.requests.post')
+    def test_html_to_text_strips_step_hint(self, mock_post):
+        """The 'Click to show step' UI hint must not be sent to the LLM."""
+        mock_response = MagicMock()
+        mock_response.json.return_value = {
+            "choices": [{"message": {"content": "ok"}}]
+        }
+        mock_response.raise_for_status = MagicMock()
+        mock_post.return_value = mock_response
+
+        steps_with_hint = (
+            '<ol class="steps">'
+            '<li class="step collapsible" data-step="1">'
+            '<span class="step__hint" aria-hidden="true">Click to show step</span>'
+            '<p>Apply the rule</p>'
+            '</li>'
+            '</ol>'
+        )
+
+        list(self.helper.get_response_stream(
+            "explain step 1",
+            steps_html=steps_with_hint,
+        ))
+
+        all_content = '\n'.join(
+            m['content']
+            for call in mock_post.call_args_list
+            for m in call.kwargs['json']['messages']
+        )
+        self.assertNotIn('Click to show step', all_content)
+        self.assertIn('Apply the rule', all_content)
+
+    @patch('chatbot.llm_chat.get_llm_helper')
+    def test_llm_response_stream_module_function(self, mock_get_helper):
+        mock_helper = MagicMock()
+        mock_helper.get_response_stream.return_value = iter([
+            {'type': 'answer', 'text': 'hi'},
+            {'type': 'done'},
+        ])
+        mock_get_helper.return_value = mock_helper
+
+        events = list(llm_response_stream("test"))
+
+        self.assertEqual(events, [
+            {'type': 'answer', 'text': 'hi'},
+            {'type': 'done'},
+        ])
 
 
 if __name__ == '__main__':

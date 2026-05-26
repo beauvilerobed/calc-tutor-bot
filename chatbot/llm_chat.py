@@ -5,21 +5,26 @@ Talks to any OpenAI-compatible chat-completions endpoint. Defaults to a local
 Ollama server; in production we point this at the self-hosted Ollama on the
 Hetzner box via env vars.
 
-Routing:
+Routing (see get_response_stream):
   1. Parse the user's message for step references ("step 2", "step 3 and 4",
      "the second step").
   2. If step numbers are found AND we have the rendered steps HTML, pull
      each referenced step's block from the HTML and make a SEPARATE LLM
-     call per step with [problem + that step + question]. Concatenate the
-     answers in order. Each call is small and focused.
+     call per step with [problem + that step + scoped question]. Each call
+     yields a {"type": "step", ...} event as soon as it finishes, so the
+     frontend can render progressively. Per-step calls drop conversation
+     history and rewrite the question to scope it to that one step.
   3. If no step references, send the question to the LLM by itself — no
-     steps context, no problem context. Let the model answer the question
-     plainly.
+     steps context, no problem context. Honor conversation history.
+
+API:
+  llm_response(...)          -> str (collects the whole answer)
+  llm_response_stream(...)   -> generator yielding event dicts
 
 Env vars:
   LLM_BASE_URL  e.g. http://localhost:11434/v1
   LLM_API_KEY   bearer token (optional for local Ollama)
-  LLM_MODEL     e.g. qwen2.5:1.5b
+  LLM_MODEL     e.g. llama3.2:3b
 """
 
 import os
@@ -130,6 +135,11 @@ def _html_to_text(html):
         return ""
     text = re.sub(r'<script[^>]*>.*?</script>', '', html, flags=re.DOTALL)
     text = re.sub(r'<style[^>]*>.*?</style>', '', text, flags=re.DOTALL)
+    # Drop UI affordances that aren't part of the solution content.
+    text = re.sub(
+        r'<span[^>]*class="[^"]*step__hint[^"]*"[^>]*>.*?</span>',
+        '', text, flags=re.DOTALL | re.IGNORECASE,
+    )
     text = re.sub(r'<h\d[^>]*>', '\n## ', text)
     text = re.sub(r'</h\d>', '\n', text)
     text = re.sub(r'<li[^>]*>', '\n• ', text)
@@ -142,7 +152,7 @@ def _html_to_text(html):
 
 
 DEFAULT_BASE_URL = "http://localhost:11434/v1"
-DEFAULT_MODEL = "qwen2.5:1.5b"
+DEFAULT_MODEL = "llama3.2:3b"
 
 
 class LLMStepHelper:
@@ -226,7 +236,7 @@ class LLMStepHelper:
                 json={
                     "model": self.model,
                     "messages": messages,
-                    "max_tokens": 200,
+                    "max_tokens": 500,
                     "temperature": 0.3,
                 },
                 timeout=90,
@@ -245,43 +255,84 @@ class LLMStepHelper:
 
     def get_response(self, message, steps_html=None, problem=None,
                      conversation_history=None):
-        """Route the user's question.
+        """Non-streaming wrapper: collect the stream into a single string.
 
-        - Step references found and resolvable -> one LLM call per step with
-          problem + step content + question. Concatenate answers.
-        - Otherwise -> single LLM call with just the question, no steps,
-          no problem context. Let the model answer plainly.
+        Kept so callers and tests that don't care about streaming still work.
+        """
+        parts = []
+        for event in self.get_response_stream(
+            message, steps_html=steps_html, problem=problem,
+            conversation_history=conversation_history,
+        ):
+            kind = event.get('type')
+            if kind == 'step':
+                parts.append(f"**Step {event['step']}**\n\n{event['text']}")
+            elif kind == 'answer':
+                parts.append(event['text'])
+        return '\n\n'.join(parts)
+
+    def get_response_stream(self, message, steps_html=None, problem=None,
+                            conversation_history=None):
+        """Route the user's question and yield events as each chunk is ready.
+
+        Yields:
+          {"type": "step",   "step": N, "text": "..."} — one per referenced step
+          {"type": "answer",            "text": "..."} — for non-step questions
+          {"type": "done"}                              — terminator
+
+        - Step references found and resolvable -> one LLM call per step,
+          yielded as each call finishes so the frontend can render immediately.
+        - Otherwise -> single LLM call answered plainly.
         """
         has_steps = bool(steps_html)
 
         if not self._is_calculus_related(message, has_steps):
-            return (
-                "I'm here to help with calculus! Feel free to ask me about "
-                "derivatives, integrals, limits, or any of the steps shown above."
-            )
+            yield {
+                'type': 'answer',
+                'text': (
+                    "I'm here to help with calculus! Feel free to ask me about "
+                    "derivatives, integrals, limits, or any of the steps shown above."
+                ),
+            }
+            yield {'type': 'done'}
+            return
 
         referenced = _referenced_step_numbers(message)
         if referenced and steps_html:
             blocks = _extract_step_blocks(steps_html)
             found = [n for n in referenced if n in blocks]
             if found:
-                answers = []
                 for n in found:
                     step_text = _html_to_text(blocks[n])
                     ans = self._call_llm(
-                        message, problem=problem,
+                        self._scoped_question(message, n, len(found)),
+                        problem=problem,
                         step_num=n, step_text=step_text,
-                        conversation_history=conversation_history,
+                        conversation_history=None,
                     )
-                    if len(found) > 1:
-                        answers.append(f"**Step {n}**\n\n{ans}")
-                    else:
-                        answers.append(ans)
-                return '\n\n'.join(answers)
+                    yield {'type': 'step', 'step': n, 'text': ans}
+                yield {'type': 'done'}
+                return
 
-        return self._call_llm(
-            message,
-            conversation_history=conversation_history,
+        ans = self._call_llm(message, conversation_history=conversation_history)
+        yield {'type': 'answer', 'text': ans}
+        yield {'type': 'done'}
+
+    @staticmethod
+    def _scoped_question(original_message, step_num, total_found):
+        """Rewrite a multi-step question into a single-step focused question.
+
+        When the student references several steps in one message, each per-step
+        LLM call should see a question scoped to just THAT step. This prevents
+        the model from refusing on ambiguity when the other referenced steps
+        aren't in its context.
+        """
+        if total_found <= 1:
+            return original_message
+        return (
+            f"The student asked: \"{original_message.strip()}\"\n\n"
+            f"Answer for Step {step_num} ONLY, using the step content provided "
+            f"in the system context. Do not mention other steps."
         )
 
 
@@ -297,6 +348,12 @@ def get_llm_helper():
 
 
 def llm_response(message, steps_html=None, problem=None, conversation_history=None):
-    """Get an LLM response for the given message."""
+    """Get an LLM response for the given message (non-streaming)."""
     helper = get_llm_helper()
     return helper.get_response(message, steps_html, problem, conversation_history)
+
+
+def llm_response_stream(message, steps_html=None, problem=None, conversation_history=None):
+    """Stream an LLM response as events. See LLMStepHelper.get_response_stream."""
+    helper = get_llm_helper()
+    yield from helper.get_response_stream(message, steps_html, problem, conversation_history)
