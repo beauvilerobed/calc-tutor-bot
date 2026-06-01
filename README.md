@@ -133,9 +133,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Support
 
-If you find this project helpful and want to chip in toward the ~$20/month hosting bill, you can:
+If you find this project helpful and want to chip in, you can:
 
 - Use [GitHub Sponsors](https://github.com/sponsors/beauvilerobed) (one-time or recurring)
 - Email [rbeauvile@calaun.org](mailto:rbeauvile@calaun.org?subject=Supporting%20CaLaun) with any other ideas
 
-CaLaun is a personal open-source project, not a 501(c)(3), so contributions are **not** tax-deductible.
+CaLaun is a open-source project, not a 501(c)(3), so contributions are **not** tax-deductible.
