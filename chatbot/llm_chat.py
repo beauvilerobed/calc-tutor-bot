@@ -38,8 +38,7 @@ Rules:
 - Answer ONLY the specific question asked. Do not re-derive the whole problem.
 - Keep it brief: 1-3 sentences plus at most one formula.
 - Wrap math in \\( ... \\) inline or \\[ ... \\] for display. Never bare \\frac.
-- If asked for a numerical answer, say: "Check the steps above, or try a new expression in the search box."
-- If off-topic, say: "I'm here to help with calculus! Ask me about derivatives, integrals, or limits.\""""
+- If asked for a numerical answer, say: "Check the steps above, or try a new expression in the search box.\""""
 
 
 # Word-form ordinals for low numbers only. For anything higher, students will
@@ -199,13 +198,22 @@ class LLMStepHelper:
         return _html_to_text(steps_html)
 
     def _build_context_block(self, problem, step_num, step_text):
-        """Build the system context message for a step-specific LLM call."""
-        parts = []
-        if problem:
-            parts.append(f"The student is working on the problem: `{problem}`")
+        """Build the system context message for a step-specific LLM call.
+
+        For per-step questions, label the step with its number (so the model
+        connects the student's "step N" to the content it's been handed) but
+        omit the overall problem expression — handing the whole problem to a
+        small model tempts it to re-derive everything instead of explaining
+        just the one step.
+        """
         if step_num is not None and step_text:
-            parts.append(f"They are asking about Step {step_num} of the solution:\n\n{step_text}")
-        return '\n\n'.join(parts) if parts else None
+            return (
+                f"The student is asking about Step {step_num} of the solution. "
+                f"Here is the exact content of Step {step_num}:\n\n{step_text}"
+            )
+        if problem:
+            return f"The student is working on the problem: `{problem}`"
+        return None
 
     def _call_llm(self, message, problem=None, step_num=None, step_text=None,
                   conversation_history=None):
