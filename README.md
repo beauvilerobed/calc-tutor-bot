@@ -100,14 +100,6 @@ python -m pytest chatbot/    # Run chatbot tests only
 - **Frontend:** Vanilla ES6 JavaScript, MathJax 3, CSS custom properties
 - **Database:** SQLite (dev) / PostgreSQL (prod via DATABASE_URL)
 
-## Production deployment
-
-The live site at [calaun.org](https://calaun.org) runs on a single Hetzner Cloud CCX13 VPS (~$20/month) hosting Django, PostgreSQL, and Ollama all on the same box. Django talks to Ollama over `localhost:11434`. See [DEPLOY.md](DEPLOY.md) for the deployment guide.
-
-The chatbot endpoint streams NDJSON, so nginx must pass response chunks through immediately. The Django view sets `X-Accel-Buffering: no` on every chatbot response — no nginx config change required.
-
-Required env vars in production: `SECRET_KEY`, `DEBUG=False`, `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS`, `DATABASE_URL`, `LLM_BASE_URL` (typically `http://localhost:11434/v1`), `LLM_MODEL` (e.g. `llama3.2:3b`).
-
 ## Project Structure
 
 ```
