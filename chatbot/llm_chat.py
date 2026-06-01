@@ -38,8 +38,7 @@ Rules:
 - Answer ONLY the specific question asked. Do not re-derive the whole problem.
 - Keep it brief: 1-3 sentences plus at most one formula.
 - Wrap math in \\( ... \\) inline or \\[ ... \\] for display. Never bare \\frac.
-- If asked for a numerical answer, say: "Check the steps above, or try a new expression in the search box."
-- If off-topic, say: "I'm here to help with calculus! Ask me about derivatives, integrals, or limits.\""""
+- If asked for a numerical answer, say: "Check the steps above, or try a new expression in the search box.\""""
 
 
 # Word-form ordinals for low numbers only. For anything higher, students will
