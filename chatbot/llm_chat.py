@@ -201,12 +201,17 @@ class LLMStepHelper:
     def _build_context_block(self, problem, step_num, step_text):
         """Build the system context message for a step-specific LLM call.
 
-        When the question is scoped to a step, hand the LLM ONLY that step's
-        content — leaving the overall problem expression out keeps the model
-        from re-deriving everything.
+        For per-step questions, label the step with its number (so the model
+        connects the student's "step N" to the content it's been handed) but
+        omit the overall problem expression — handing the whole problem to a
+        small model tempts it to re-derive everything instead of explaining
+        just the one step.
         """
         if step_num is not None and step_text:
-            return f"The student is asking about this step:\n\n{step_text}"
+            return (
+                f"The student is asking about Step {step_num} of the solution. "
+                f"Here is the exact content of Step {step_num}:\n\n{step_text}"
+            )
         if problem:
             return f"The student is working on the problem: `{problem}`"
         return None
