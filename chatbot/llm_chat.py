@@ -199,13 +199,17 @@ class LLMStepHelper:
         return _html_to_text(steps_html)
 
     def _build_context_block(self, problem, step_num, step_text):
-        """Build the system context message for a step-specific LLM call."""
-        parts = []
-        if problem:
-            parts.append(f"The student is working on the problem: `{problem}`")
+        """Build the system context message for a step-specific LLM call.
+
+        When the question is scoped to a step, hand the LLM ONLY that step's
+        content — leaving the overall problem expression out keeps the model
+        from re-deriving everything.
+        """
         if step_num is not None and step_text:
-            parts.append(f"They are asking about Step {step_num} of the solution:\n\n{step_text}")
-        return '\n\n'.join(parts) if parts else None
+            return f"The student is asking about this step:\n\n{step_text}"
+        if problem:
+            return f"The student is working on the problem: `{problem}`"
+        return None
 
     def _call_llm(self, message, problem=None, step_num=None, step_text=None,
                   conversation_history=None):

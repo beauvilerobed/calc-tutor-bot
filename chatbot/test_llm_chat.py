@@ -159,7 +159,7 @@ class TestLLMStepHelper(unittest.TestCase):
 
     @patch('chatbot.llm_chat.requests.post')
     def test_get_response_single_step_reference(self, mock_post):
-        """One step referenced -> one LLM call with that step + problem."""
+        """One step referenced -> one LLM call with ONLY that step's content."""
         mock_response = MagicMock()
         mock_response.json.return_value = {
             "choices": [{"message": {"content": "Step 2 explanation."}}]
@@ -179,9 +179,10 @@ class TestLLMStepHelper(unittest.TestCase):
 
         sent = mock_post.call_args.kwargs['json']['messages']
         system_content = '\n'.join(m['content'] for m in sent if m['role'] == 'system')
-        self.assertIn("diff(x^5, x)", system_content)
-        self.assertIn("Step 2", system_content)
         self.assertIn("Multiply by the coefficient", system_content)
+        # The overall problem must NOT leak into a per-step call — otherwise
+        # the model gets tempted to re-derive everything.
+        self.assertNotIn("diff(x^5, x)", system_content)
         # Should NOT include step 1 or step 3 content.
         self.assertNotIn("Apply the power rule", system_content)
         self.assertNotIn("Final answer", system_content)
